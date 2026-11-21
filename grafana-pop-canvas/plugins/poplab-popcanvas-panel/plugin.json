@@ -1,0 +1,21 @@
+{
+  "type": "panel",
+  "name": "POP Canvas",
+  "id": "poplab-popcanvas-panel",
+  "info": {
+    "description": "Cartão de POP com dois estados e um histórico",
+    "author": {
+      "name": "POP Lab"
+    },
+    "logos": {
+      "small": "icon.svg",
+      "large": "icon.svg"
+    },
+    "version": "1.0.0",
+    "updated": "2026-11-21"
+  },
+  "dependencies": {
+    "grafanaDependency": ">=12.0.0 <13.0.0",
+    "plugins": []
+  }
+}

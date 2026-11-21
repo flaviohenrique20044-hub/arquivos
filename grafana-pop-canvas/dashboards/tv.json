@@ -1,0 +1,1044 @@
+{
+  "id": null,
+  "uid": "pop-tv",
+  "title": "Energia e baterias dos POPs",
+  "editable": true,
+  "schemaVersion": 42,
+  "version": 1,
+  "timezone": "America/Sao_Paulo",
+  "refresh": "15s",
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "tags": [
+    "POP",
+    "TV"
+  ],
+  "panels": [
+    {
+      "id": 1,
+      "type": "poplab-popcanvas-panel",
+      "title": "",
+      "transparent": true,
+      "datasource": {
+        "uid": "pop-prom",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 3,
+        "h": 4
+      },
+      "interval": "15s",
+      "options": {
+        "popName": "POP Anísio de Abreu",
+        "labelA": "Roteador",
+        "labelB": "Energia",
+        "upA": 1,
+        "downA": 0,
+        "upB": 1,
+        "downB": 0,
+        "validitySeconds": 45,
+        "chartTitle": "Tensão do banco",
+        "unit": "V",
+        "decimals": 1,
+        "gapSeconds": 22.5
+      },
+      "targets": []
+    },
+    {
+      "id": 2,
+      "type": "poplab-popcanvas-panel",
+      "title": "",
+      "transparent": true,
+      "datasource": {
+        "uid": "pop-prom",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 3,
+        "y": 0,
+        "w": 3,
+        "h": 4
+      },
+      "interval": "15s",
+      "options": {
+        "popName": "POP Angico",
+        "labelA": "Roteador",
+        "labelB": "Energia",
+        "upA": 1,
+        "downA": 0,
+        "upB": 1,
+        "downB": 0,
+        "validitySeconds": 45,
+        "chartTitle": "Tensão do banco",
+        "unit": "V",
+        "decimals": 1,
+        "gapSeconds": 22.5
+      },
+      "targets": []
+    },
+    {
+      "id": 3,
+      "type": "poplab-popcanvas-panel",
+      "title": "",
+      "transparent": true,
+      "datasource": {
+        "uid": "pop-prom",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 6,
+        "y": 0,
+        "w": 3,
+        "h": 4
+      },
+      "interval": "15s",
+      "options": {
+        "popName": "POP Auto Portante",
+        "labelA": "Roteador",
+        "labelB": "Energia",
+        "upA": 1,
+        "downA": 0,
+        "upB": 1,
+        "downB": 0,
+        "validitySeconds": 45,
+        "chartTitle": "Tensão do banco",
+        "unit": "V",
+        "decimals": 1,
+        "gapSeconds": 22.5
+      },
+      "targets": []
+    },
+    {
+      "id": 4,
+      "type": "poplab-popcanvas-panel",
+      "title": "",
+      "transparent": true,
+      "datasource": {
+        "uid": "pop-prom",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 9,
+        "y": 0,
+        "w": 3,
+        "h": 4
+      },
+      "interval": "15s",
+      "options": {
+        "popName": "POP Currais",
+        "labelA": "Roteador",
+        "labelB": "Energia",
+        "upA": 1,
+        "downA": 0,
+        "upB": 1,
+        "downB": 0,
+        "validitySeconds": 45,
+        "chartTitle": "Tensão do banco",
+        "unit": "V",
+        "decimals": 1,
+        "gapSeconds": 22.5
+      },
+      "targets": []
+    },
+    {
+      "id": 5,
+      "type": "poplab-popcanvas-panel",
+      "title": "",
+      "transparent": true,
+      "datasource": {
+        "uid": "pop-prom",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 0,
+        "w": 3,
+        "h": 4
+      },
+      "interval": "15s",
+      "options": {
+        "popName": "POP Bonfim",
+        "labelA": "Roteador",
+        "labelB": "Energia",
+        "upA": 1,
+        "downA": 0,
+        "upB": 1,
+        "downB": 0,
+        "validitySeconds": 45,
+        "chartTitle": "Tensão do banco",
+        "unit": "V",
+        "decimals": 1,
+        "gapSeconds": 22.5
+      },
+      "targets": []
+    },
+    {
+      "id": 6,
+      "type": "poplab-popcanvas-panel",
+      "title": "",
+      "transparent": true,
+      "datasource": {
+        "uid": "pop-prom",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 15,
+        "y": 0,
+        "w": 3,
+        "h": 4
+      },
+      "interval": "15s",
+      "options": {
+        "popName": "POP Sobradinho",
+        "labelA": "Roteador",
+        "labelB": "Energia",
+        "upA": 1,
+        "downA": 0,
+        "upB": 1,
+        "downB": 0,
+        "validitySeconds": 45,
+        "chartTitle": "Tensão do banco",
+        "unit": "V",
+        "decimals": 1,
+        "gapSeconds": 22.5
+      },
+      "targets": []
+    },
+    {
+      "id": 7,
+      "type": "poplab-popcanvas-panel",
+      "title": "",
+      "transparent": true,
+      "datasource": {
+        "uid": "pop-prom",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 18,
+        "y": 0,
+        "w": 3,
+        "h": 4
+      },
+      "interval": "15s",
+      "options": {
+        "popName": "DC Campo Alegre",
+        "labelA": "Roteador",
+        "labelB": "Energia",
+        "upA": 1,
+        "downA": 0,
+        "upB": 1,
+        "downB": 0,
+        "validitySeconds": 45,
+        "chartTitle": "Tensão do banco",
+        "unit": "V",
+        "decimals": 1,
+        "gapSeconds": 22.5
+      },
+      "targets": []
+    },
+    {
+      "id": 8,
+      "type": "poplab-popcanvas-panel",
+      "title": "",
+      "transparent": true,
+      "datasource": {
+        "uid": "pop-prom",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 21,
+        "y": 0,
+        "w": 3,
+        "h": 4
+      },
+      "interval": "15s",
+      "options": {
+        "popName": "POP Cavaleiro",
+        "labelA": "Roteador",
+        "labelB": "Energia",
+        "upA": 1,
+        "downA": 0,
+        "upB": 1,
+        "downB": 0,
+        "validitySeconds": 45,
+        "chartTitle": "Tensão do banco",
+        "unit": "V",
+        "decimals": 1,
+        "gapSeconds": 22.5
+      },
+      "targets": []
+    },
+    {
+      "id": 9,
+      "type": "poplab-popcanvas-panel",
+      "title": "",
+      "transparent": true,
+      "datasource": {
+        "uid": "pop-prom",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 4,
+        "w": 3,
+        "h": 4
+      },
+      "interval": "15s",
+      "options": {
+        "popName": "POP Guaribas",
+        "labelA": "Roteador",
+        "labelB": "Energia",
+        "upA": 1,
+        "downA": 0,
+        "upB": 1,
+        "downB": 0,
+        "validitySeconds": 45,
+        "chartTitle": "Tensão do banco",
+        "unit": "V",
+        "decimals": 1,
+        "gapSeconds": 22.5
+      },
+      "targets": []
+    },
+    {
+      "id": 10,
+      "type": "poplab-popcanvas-panel",
+      "title": "",
+      "transparent": true,
+      "datasource": {
+        "uid": "pop-prom",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 3,
+        "y": 4,
+        "w": 3,
+        "h": 4
+      },
+      "interval": "15s",
+      "options": {
+        "popName": "POP Caracol",
+        "labelA": "Roteador",
+        "labelB": "Energia",
+        "upA": 1,
+        "downA": 0,
+        "upB": 1,
+        "downB": 0,
+        "validitySeconds": 45,
+        "chartTitle": "Tensão do banco",
+        "unit": "V",
+        "decimals": 1,
+        "gapSeconds": 22.5
+      },
+      "targets": []
+    },
+    {
+      "id": 11,
+      "type": "poplab-popcanvas-panel",
+      "title": "",
+      "transparent": true,
+      "datasource": {
+        "uid": "pop-prom",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 6,
+        "y": 4,
+        "w": 3,
+        "h": 4
+      },
+      "interval": "15s",
+      "options": {
+        "popName": "POP Coronel",
+        "labelA": "Roteador",
+        "labelB": "Energia",
+        "upA": 1,
+        "downA": 0,
+        "upB": 1,
+        "downB": 0,
+        "validitySeconds": 45,
+        "chartTitle": "Tensão do banco",
+        "unit": "V",
+        "decimals": 1,
+        "gapSeconds": 22.5
+      },
+      "targets": []
+    },
+    {
+      "id": 12,
+      "type": "poplab-popcanvas-panel",
+      "title": "",
+      "transparent": true,
+      "datasource": {
+        "uid": "pop-prom",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 9,
+        "y": 4,
+        "w": 3,
+        "h": 4
+      },
+      "interval": "15s",
+      "options": {
+        "popName": "POP Dirceu",
+        "labelA": "Roteador",
+        "labelB": "Energia",
+        "upA": 1,
+        "downA": 0,
+        "upB": 1,
+        "downB": 0,
+        "validitySeconds": 45,
+        "chartTitle": "Tensão do banco",
+        "unit": "V",
+        "decimals": 1,
+        "gapSeconds": 22.5
+      },
+      "targets": []
+    },
+    {
+      "id": 13,
+      "type": "poplab-popcanvas-panel",
+      "title": "",
+      "transparent": true,
+      "datasource": {
+        "uid": "pop-prom",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 4,
+        "w": 3,
+        "h": 4
+      },
+      "interval": "15s",
+      "options": {
+        "popName": "POP Fartura",
+        "labelA": "Roteador",
+        "labelB": "Energia",
+        "upA": 1,
+        "downA": 0,
+        "upB": 1,
+        "downB": 0,
+        "validitySeconds": 45,
+        "chartTitle": "Tensão do banco",
+        "unit": "V",
+        "decimals": 1,
+        "gapSeconds": 22.5
+      },
+      "targets": []
+    },
+    {
+      "id": 14,
+      "type": "poplab-popcanvas-panel",
+      "title": "",
+      "transparent": true,
+      "datasource": {
+        "uid": "pop-prom",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 15,
+        "y": 4,
+        "w": 3,
+        "h": 4
+      },
+      "interval": "15s",
+      "options": {
+        "popName": "POP Lagoa do Buraco FTTH",
+        "labelA": "Roteador",
+        "labelB": "Energia",
+        "upA": 1,
+        "downA": 0,
+        "upB": 1,
+        "downB": 0,
+        "validitySeconds": 45,
+        "chartTitle": "Tensão do banco",
+        "unit": "V",
+        "decimals": 1,
+        "gapSeconds": 22.5
+      },
+      "targets": []
+    },
+    {
+      "id": 15,
+      "type": "poplab-popcanvas-panel",
+      "title": "",
+      "transparent": true,
+      "datasource": {
+        "uid": "pop-prom",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 18,
+        "y": 4,
+        "w": 3,
+        "h": 4
+      },
+      "interval": "15s",
+      "options": {
+        "popName": "POP Lagoa do Buraco",
+        "labelA": "Roteador",
+        "labelB": "Energia",
+        "upA": 1,
+        "downA": 0,
+        "upB": 1,
+        "downB": 0,
+        "validitySeconds": 45,
+        "chartTitle": "Tensão do banco",
+        "unit": "V",
+        "decimals": 1,
+        "gapSeconds": 22.5
+      },
+      "targets": []
+    },
+    {
+      "id": 16,
+      "type": "poplab-popcanvas-panel",
+      "title": "",
+      "transparent": true,
+      "datasource": {
+        "uid": "pop-prom",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 21,
+        "y": 4,
+        "w": 3,
+        "h": 4
+      },
+      "interval": "15s",
+      "options": {
+        "popName": "POP Lagoa de Fora S.",
+        "labelA": "Roteador",
+        "labelB": "Energia",
+        "upA": 1,
+        "downA": 0,
+        "upB": 1,
+        "downB": 0,
+        "validitySeconds": 45,
+        "chartTitle": "Tensão do banco",
+        "unit": "V",
+        "decimals": 1,
+        "gapSeconds": 22.5
+      },
+      "targets": []
+    },
+    {
+      "id": 17,
+      "type": "poplab-popcanvas-panel",
+      "title": "",
+      "transparent": true,
+      "datasource": {
+        "uid": "pop-prom",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 8,
+        "w": 3,
+        "h": 4
+      },
+      "interval": "15s",
+      "options": {
+        "popName": "POP Mandacaru",
+        "labelA": "Roteador",
+        "labelB": "Energia",
+        "upA": 1,
+        "downA": 0,
+        "upB": 1,
+        "downB": 0,
+        "validitySeconds": 45,
+        "chartTitle": "Tensão do banco",
+        "unit": "V",
+        "decimals": 1,
+        "gapSeconds": 22.5
+      },
+      "targets": []
+    },
+    {
+      "id": 18,
+      "type": "poplab-popcanvas-panel",
+      "title": "",
+      "transparent": true,
+      "datasource": {
+        "uid": "pop-prom",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 3,
+        "y": 8,
+        "w": 3,
+        "h": 4
+      },
+      "interval": "15s",
+      "options": {
+        "popName": "POP São Braz",
+        "labelA": "Roteador",
+        "labelB": "Energia",
+        "upA": 1,
+        "downA": 0,
+        "upB": 1,
+        "downB": 0,
+        "validitySeconds": 45,
+        "chartTitle": "Tensão do banco",
+        "unit": "V",
+        "decimals": 1,
+        "gapSeconds": 22.5
+      },
+      "targets": []
+    },
+    {
+      "id": 19,
+      "type": "poplab-popcanvas-panel",
+      "title": "",
+      "transparent": true,
+      "datasource": {
+        "uid": "pop-prom",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 6,
+        "y": 8,
+        "w": 3,
+        "h": 4
+      },
+      "interval": "15s",
+      "options": {
+        "popName": "POP Morro da Patola S.",
+        "labelA": "Roteador",
+        "labelB": "Energia",
+        "upA": 1,
+        "downA": 0,
+        "upB": 1,
+        "downB": 0,
+        "validitySeconds": 45,
+        "chartTitle": "Tensão do banco",
+        "unit": "V",
+        "decimals": 1,
+        "gapSeconds": 22.5
+      },
+      "targets": []
+    },
+    {
+      "id": 20,
+      "type": "poplab-popcanvas-panel",
+      "title": "",
+      "transparent": true,
+      "datasource": {
+        "uid": "pop-prom",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 9,
+        "y": 8,
+        "w": 3,
+        "h": 4
+      },
+      "interval": "15s",
+      "options": {
+        "popName": "POP Mudubim",
+        "labelA": "Roteador",
+        "labelB": "Energia",
+        "upA": 1,
+        "downA": 0,
+        "upB": 1,
+        "downB": 0,
+        "validitySeconds": 45,
+        "chartTitle": "Tensão do banco",
+        "unit": "V",
+        "decimals": 1,
+        "gapSeconds": 22.5
+      },
+      "targets": []
+    },
+    {
+      "id": 21,
+      "type": "poplab-popcanvas-panel",
+      "title": "",
+      "transparent": true,
+      "datasource": {
+        "uid": "pop-prom",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 8,
+        "w": 3,
+        "h": 4
+      },
+      "interval": "15s",
+      "options": {
+        "popName": "POP Novo Zabelê",
+        "labelA": "Roteador",
+        "labelB": "Energia",
+        "upA": 1,
+        "downA": 0,
+        "upB": 1,
+        "downB": 0,
+        "validitySeconds": 45,
+        "chartTitle": "Tensão do banco",
+        "unit": "V",
+        "decimals": 1,
+        "gapSeconds": 22.5
+      },
+      "targets": []
+    },
+    {
+      "id": 22,
+      "type": "poplab-popcanvas-panel",
+      "title": "",
+      "transparent": true,
+      "datasource": {
+        "uid": "pop-prom",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 15,
+        "y": 8,
+        "w": 3,
+        "h": 4
+      },
+      "interval": "15s",
+      "options": {
+        "popName": "POP Lagoa da Onça",
+        "labelA": "Roteador",
+        "labelB": "Energia",
+        "upA": 1,
+        "downA": 0,
+        "upB": 1,
+        "downB": 0,
+        "validitySeconds": 45,
+        "chartTitle": "Tensão do banco",
+        "unit": "V",
+        "decimals": 1,
+        "gapSeconds": 22.5
+      },
+      "targets": []
+    },
+    {
+      "id": 23,
+      "type": "poplab-popcanvas-panel",
+      "title": "",
+      "transparent": true,
+      "datasource": {
+        "uid": "pop-prom",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 18,
+        "y": 8,
+        "w": 3,
+        "h": 4
+      },
+      "interval": "15s",
+      "options": {
+        "popName": "POP Sossego",
+        "labelA": "Roteador",
+        "labelB": "Energia",
+        "upA": 1,
+        "downA": 0,
+        "upB": 1,
+        "downB": 0,
+        "validitySeconds": 45,
+        "chartTitle": "Tensão do banco",
+        "unit": "V",
+        "decimals": 1,
+        "gapSeconds": 22.5
+      },
+      "targets": []
+    },
+    {
+      "id": 24,
+      "type": "poplab-popcanvas-panel",
+      "title": "",
+      "transparent": true,
+      "datasource": {
+        "uid": "pop-prom",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 21,
+        "y": 8,
+        "w": 3,
+        "h": 4
+      },
+      "interval": "15s",
+      "options": {
+        "popName": "POP Varzea Branca",
+        "labelA": "Roteador",
+        "labelB": "Energia",
+        "upA": 1,
+        "downA": 0,
+        "upB": 1,
+        "downB": 0,
+        "validitySeconds": 45,
+        "chartTitle": "Tensão do banco",
+        "unit": "V",
+        "decimals": 1,
+        "gapSeconds": 22.5
+      },
+      "targets": []
+    },
+    {
+      "id": 25,
+      "type": "poplab-popcanvas-panel",
+      "title": "",
+      "transparent": true,
+      "datasource": {
+        "uid": "pop-prom",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 12,
+        "w": 3,
+        "h": 4
+      },
+      "interval": "15s",
+      "options": {
+        "popName": "POP São Lourenço",
+        "labelA": "Roteador",
+        "labelB": "Energia",
+        "upA": 1,
+        "downA": 0,
+        "upB": 1,
+        "downB": 0,
+        "validitySeconds": 45,
+        "chartTitle": "Tensão do banco",
+        "unit": "V",
+        "decimals": 1,
+        "gapSeconds": 22.5
+      },
+      "targets": []
+    },
+    {
+      "id": 26,
+      "type": "poplab-popcanvas-panel",
+      "title": "",
+      "transparent": true,
+      "datasource": {
+        "uid": "pop-prom",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 3,
+        "y": 12,
+        "w": 3,
+        "h": 4
+      },
+      "interval": "15s",
+      "options": {
+        "popName": "POP São Vitor",
+        "labelA": "Roteador",
+        "labelB": "Energia",
+        "upA": 1,
+        "downA": 0,
+        "upB": 1,
+        "downB": 0,
+        "validitySeconds": 45,
+        "chartTitle": "Tensão do banco",
+        "unit": "V",
+        "decimals": 1,
+        "gapSeconds": 22.5
+      },
+      "targets": []
+    },
+    {
+      "id": 27,
+      "type": "poplab-popcanvas-panel",
+      "title": "",
+      "transparent": true,
+      "datasource": {
+        "uid": "pop-prom",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 6,
+        "y": 12,
+        "w": 3,
+        "h": 4
+      },
+      "interval": "15s",
+      "options": {
+        "popName": "POP São Vitor S.",
+        "labelA": "Roteador",
+        "labelB": "Energia",
+        "upA": 1,
+        "downA": 0,
+        "upB": 1,
+        "downB": 0,
+        "validitySeconds": 45,
+        "chartTitle": "Tensão do banco",
+        "unit": "V",
+        "decimals": 1,
+        "gapSeconds": 22.5
+      },
+      "targets": []
+    },
+    {
+      "id": 28,
+      "type": "poplab-popcanvas-panel",
+      "title": "",
+      "transparent": true,
+      "datasource": {
+        "uid": "pop-prom",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 9,
+        "y": 12,
+        "w": 3,
+        "h": 4
+      },
+      "interval": "15s",
+      "options": {
+        "popName": "POP Serra Branca",
+        "labelA": "Roteador",
+        "labelB": "Energia",
+        "upA": 1,
+        "downA": 0,
+        "upB": 1,
+        "downB": 0,
+        "validitySeconds": 45,
+        "chartTitle": "Tensão do banco",
+        "unit": "V",
+        "decimals": 1,
+        "gapSeconds": 22.5
+      },
+      "targets": []
+    },
+    {
+      "id": 29,
+      "type": "poplab-popcanvas-panel",
+      "title": "",
+      "transparent": true,
+      "datasource": {
+        "uid": "pop-prom",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 12,
+        "w": 3,
+        "h": 4
+      },
+      "interval": "15s",
+      "options": {
+        "popName": "POP Serra Guaribas",
+        "labelA": "Roteador",
+        "labelB": "Energia",
+        "upA": 1,
+        "downA": 0,
+        "upB": 1,
+        "downB": 0,
+        "validitySeconds": 45,
+        "chartTitle": "Tensão do banco",
+        "unit": "V",
+        "decimals": 1,
+        "gapSeconds": 22.5
+      },
+      "targets": []
+    },
+    {
+      "id": 30,
+      "type": "poplab-popcanvas-panel",
+      "title": "",
+      "transparent": true,
+      "datasource": {
+        "uid": "pop-prom",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 15,
+        "y": 12,
+        "w": 3,
+        "h": 4
+      },
+      "interval": "15s",
+      "options": {
+        "popName": "POP Serra Nova",
+        "labelA": "Roteador",
+        "labelB": "Energia",
+        "upA": 1,
+        "downA": 0,
+        "upB": 1,
+        "downB": 0,
+        "validitySeconds": 45,
+        "chartTitle": "Tensão do banco",
+        "unit": "V",
+        "decimals": 1,
+        "gapSeconds": 22.5
+      },
+      "targets": []
+    },
+    {
+      "id": 31,
+      "type": "poplab-popcanvas-panel",
+      "title": "",
+      "transparent": true,
+      "datasource": {
+        "uid": "pop-prom",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 18,
+        "y": 12,
+        "w": 3,
+        "h": 4
+      },
+      "interval": "15s",
+      "options": {
+        "popName": "POP Tamboril",
+        "labelA": "Roteador",
+        "labelB": "Energia",
+        "upA": 1,
+        "downA": 0,
+        "upB": 1,
+        "downB": 0,
+        "validitySeconds": 45,
+        "chartTitle": "Tensão do banco",
+        "unit": "V",
+        "decimals": 1,
+        "gapSeconds": 22.5
+      },
+      "targets": []
+    },
+    {
+      "id": 32,
+      "type": "poplab-popcanvas-panel",
+      "title": "",
+      "transparent": true,
+      "datasource": {
+        "uid": "pop-prom",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 21,
+        "y": 12,
+        "w": 3,
+        "h": 4
+      },
+      "interval": "15s",
+      "options": {
+        "popName": "DC SRN – Temperatura",
+        "labelA": "Roteador",
+        "labelB": "Energia",
+        "upA": 1,
+        "downA": 0,
+        "upB": 1,
+        "downB": 0,
+        "validitySeconds": 45,
+        "chartTitle": "Temperatura ambiente",
+        "unit": "°C",
+        "decimals": 1,
+        "gapSeconds": 22.5
+      },
+      "targets": []
+    }
+  ]
+}

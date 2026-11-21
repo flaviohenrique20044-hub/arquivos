@@ -1,0 +1,21 @@
+# Estado ICMP do roteador
+probe_success{job="pop-icmp",instance="192.168.1.1"}
+
+# Estado ICMP do DNS Google
+probe_success{job="pop-icmp",instance="8.8.8.8"}
+
+# RTT do roteador em milissegundos
+1000 * probe_icmp_rtt_seconds{job="pop-icmp",instance="192.168.1.1"}
+
+# RTT dos dois alvos em milissegundos
+1000 * probe_icmp_rtt_seconds{job="pop-icmp"}
+
+# Saúde da coleta HTTP de cada alvo
+up{job="pop-icmp"}
+
+# Contagem de amostras ICMP reais por alvo nos últimos 2 minutos
+count_over_time(probe_success{job="pop-icmp"}[2m])
+
+# Consultas instantâneas A e B do cartão, preservando o timestamp das leituras
+probe_success{job="pop-icmp",instance="192.168.1.1"}[5m]
+probe_success{job="pop-icmp",instance="8.8.8.8"}[5m]

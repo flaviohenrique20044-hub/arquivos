@@ -1,0 +1,89 @@
+{
+  "id": null,
+  "uid": "pop-laboratorio",
+  "title": "Laboratório POP",
+  "editable": true,
+  "schemaVersion": 42,
+  "version": 1,
+  "timezone": "America/Sao_Paulo",
+  "refresh": "15s",
+  "time": {
+    "from": "now-5m",
+    "to": "now"
+  },
+  "tags": [
+    "POP",
+    "ICMP"
+  ],
+  "panels": [
+    {
+      "id": 1,
+      "type": "poplab-popcanvas-panel",
+      "title": "",
+      "transparent": true,
+      "datasource": {
+        "uid": "pop-prom",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 10,
+        "h": 9
+      },
+      "interval": "15s",
+      "options": {
+        "popName": "Laboratório local",
+        "labelA": "Roteador",
+        "labelB": "DNS Google",
+        "upA": 1,
+        "downA": 0,
+        "upB": 1,
+        "downB": 0,
+        "validitySeconds": 45,
+        "chartTitle": "Latência do roteador",
+        "unit": "ms",
+        "decimals": 0,
+        "gapSeconds": 22.5
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "uid": "pop-prom",
+            "type": "prometheus"
+          },
+          "expr": "probe_success{job=\"pop-icmp\",instance=\"192.168.1.1\"}[5m]",
+          "range": false,
+          "instant": true,
+          "editorMode": "code",
+          "format": "time_series"
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "uid": "pop-prom",
+            "type": "prometheus"
+          },
+          "expr": "probe_success{job=\"pop-icmp\",instance=\"8.8.8.8\"}[5m]",
+          "range": false,
+          "instant": true,
+          "editorMode": "code",
+          "format": "time_series"
+        },
+        {
+          "refId": "C",
+          "datasource": {
+            "uid": "pop-prom",
+            "type": "prometheus"
+          },
+          "expr": "1000 * probe_icmp_rtt_seconds{job=\"pop-icmp\",instance=\"192.168.1.1\"}",
+          "range": true,
+          "instant": false,
+          "editorMode": "code",
+          "format": "time_series"
+        }
+      ]
+    }
+  ]
+}
