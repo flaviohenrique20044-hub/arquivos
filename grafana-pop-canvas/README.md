@@ -2,6 +2,8 @@
 
 Painel com dois indicadores de estado e uma série temporal no mesmo cartão. Inclui o fonte, o plugin compilado e duas dashboards importáveis.
 
+[Abra o manual de instalação](MANUAL-INSTALACAO.md) para instruções de Linux, Docker e Windows e configuração com Zabbix.
+
 ## Instalação pelo terminal
 
 Clone o repositório privado com uma conta que tenha acesso. O plugin já vem compilado.
