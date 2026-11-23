@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { getDisplayProcessor, PanelPlugin } from '@grafana/data';
 import { TimeSeries, TooltipPlugin, useTheme2 } from '@grafana/ui';
 
@@ -38,26 +38,27 @@ function series(data, refId) {
   });
 }
 
-function newest(data, refId) {
-  let latest;
+function useIndicator(data, refId, up, down, popName, timeRange) {
+  const previous = useRef();
+  const target = data.request?.targets?.find((query) => query.refId === refId);
+  const scope = JSON.stringify([popName, target, data.request?.scopedVars, timeRange.raw, up, down]);
+  let latest = previous.current?.scope === scope ? previous.current.sample : undefined;
   for (const { time, value } of series(data, refId)) {
     time.values.forEach((timestamp, index) => {
-      if (valid(timestamp) && (!latest || timestamp > latest.timestamp)) {
-        latest = { timestamp, value: value.values[index] };
+      const reading = value.values[index];
+      if (valid(timestamp) && valid(reading) && (reading === up || reading === down) &&
+          (!latest || timestamp >= latest.timestamp)) {
+        latest = { timestamp, value: reading };
       }
     });
   }
-  return latest;
-}
-
-function state(sample, now, validityMs, up, down) {
-  if (!sample || !valid(sample.value) || now - sample.timestamp >= validityMs || up === down) {
+  useEffect(() => {
+    previous.current = { scope, sample: latest };
+  }, [scope, latest]);
+  if (!latest || up === down) {
     return 'N/D';
   }
-  if (sample.value === up) {
-    return 'UP';
-  }
-  return sample.value === down ? 'DOWN' : 'N/D';
+  return latest.value === up ? 'UP' : 'DOWN';
 }
 
 function Indicator({ label, status }) {
@@ -149,25 +150,8 @@ function history(data, timeRange, options, theme, timeZone) {
 
 function Panel({ options, title, data, width, height, timeRange, timeZone }) {
   const theme = useTheme2();
-  const a = newest(data, 'A');
-  const b = newest(data, 'B');
-  const validityMs = (options.validitySeconds ?? 45) * 1000;
-  const [, expire] = useState(0);
-  const now = Date.now();
-  const statusA = state(a, now, validityMs, options.upA, options.downA);
-  const statusB = state(b, now, validityMs, options.upB, options.downB);
-  useEffect(() => {
-    const current = Date.now();
-    const deadlines = [a?.timestamp, b?.timestamp]
-      .filter(valid)
-      .map((timestamp) => timestamp + validityMs)
-      .filter((deadline) => deadline > current);
-    if (!deadlines.length) {
-      return;
-    }
-    const timer = setTimeout(() => expire((value) => value + 1), Math.min(...deadlines) - current + 20);
-    return () => clearTimeout(timer);
-  }, [a?.timestamp, b?.timestamp, validityMs, statusA, statusB]);
+  const statusA = useIndicator(data, 'A', options.upA, options.downA, options.popName, timeRange);
+  const statusB = useIndicator(data, 'B', options.upB, options.downB, options.popName, timeRange);
 
   const { frame, last, lastColor } = useMemo(
     () => history(data, timeRange, options, theme, timeZone),
@@ -223,8 +207,6 @@ export const plugin = new PanelPlugin(Panel).setPanelOptions((builder) => builde
   .addTextInput({ path: 'labelB', name: 'Nome do indicador B', defaultValue: 'Energia' })
   .addNumberInput({ path: 'upB', name: 'Valor UP para B', defaultValue: 1 })
   .addNumberInput({ path: 'downB', name: 'Valor DOWN para B', defaultValue: 0 })
-  .addNumberInput({ path: 'validitySeconds', name: 'Validade dos indicadores em segundos', defaultValue: 45,
-    settings: { min: 1, max: 86400 } })
   .addTextInput({ path: 'chartTitle', name: 'Título do gráfico C', defaultValue: 'Tensão do banco' })
   .addTextInput({ path: 'unit', name: 'Unidade do gráfico C', defaultValue: 'V' })
   .addSelect({

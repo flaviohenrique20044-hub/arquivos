@@ -82,25 +82,26 @@ function series(data, refId) {
     return time && value ? [{ frame, time, value }] : [];
   });
 }
-function newest(data, refId) {
-  let latest;
+function useIndicator(data, refId, up, down, popName, timeRange) {
+  const previous = (0, import_react.useRef)();
+  const target = data.request?.targets?.find((query) => query.refId === refId);
+  const scope = JSON.stringify([popName, target, data.request?.scopedVars, timeRange.raw, up, down]);
+  let latest = previous.current?.scope === scope ? previous.current.sample : void 0;
   for (const { time, value } of series(data, refId)) {
     time.values.forEach((timestamp, index) => {
-      if (valid(timestamp) && (!latest || timestamp > latest.timestamp)) {
-        latest = { timestamp, value: value.values[index] };
+      const reading = value.values[index];
+      if (valid(timestamp) && valid(reading) && (reading === up || reading === down) && (!latest || timestamp >= latest.timestamp)) {
+        latest = { timestamp, value: reading };
       }
     });
   }
-  return latest;
-}
-function state(sample, now, validityMs, up, down) {
-  if (!sample || !valid(sample.value) || now - sample.timestamp >= validityMs || up === down) {
+  (0, import_react.useEffect)(() => {
+    previous.current = { scope, sample: latest };
+  }, [scope, latest]);
+  if (!latest || up === down) {
     return "N/D";
   }
-  if (sample.value === up) {
-    return "UP";
-  }
-  return sample.value === down ? "DOWN" : "N/D";
+  return latest.value === up ? "UP" : "DOWN";
 }
 function Indicator({ label, status }) {
   return /* @__PURE__ */ import_react.default.createElement("div", { style: { minWidth: 0, textAlign: "center" } }, /* @__PURE__ */ import_react.default.createElement("div", { "aria-label": label + " " + status, style: {
@@ -193,22 +194,8 @@ function history(data, timeRange, options, theme, timeZone) {
 }
 function Panel({ options, title, data, width, height, timeRange, timeZone }) {
   const theme = (0, import_ui.useTheme2)();
-  const a = newest(data, "A");
-  const b = newest(data, "B");
-  const validityMs = (options.validitySeconds ?? 45) * 1e3;
-  const [, expire] = (0, import_react.useState)(0);
-  const now = Date.now();
-  const statusA = state(a, now, validityMs, options.upA, options.downA);
-  const statusB = state(b, now, validityMs, options.upB, options.downB);
-  (0, import_react.useEffect)(() => {
-    const current = Date.now();
-    const deadlines = [a?.timestamp, b?.timestamp].filter(valid).map((timestamp) => timestamp + validityMs).filter((deadline) => deadline > current);
-    if (!deadlines.length) {
-      return;
-    }
-    const timer = setTimeout(() => expire((value) => value + 1), Math.min(...deadlines) - current + 20);
-    return () => clearTimeout(timer);
-  }, [a?.timestamp, b?.timestamp, validityMs, statusA, statusB]);
+  const statusA = useIndicator(data, "A", options.upA, options.downA, options.popName, timeRange);
+  const statusB = useIndicator(data, "B", options.upB, options.downB, options.popName, timeRange);
   const { frame, last, lastColor } = (0, import_react.useMemo)(
     () => history(data, timeRange, options, theme, timeZone),
     [data, timeRange, options, theme, timeZone]
@@ -243,12 +230,7 @@ function Panel({ options, title, data, width, height, timeRange, timeZone }) {
     (config, alignedFrame) => /* @__PURE__ */ import_react.default.createElement(import_ui.TooltipPlugin, { config, data: alignedFrame, frames, timeZone })
   )) : /* @__PURE__ */ import_react.default.createElement("div", { style: { flex: 1, display: "grid", placeItems: "center", fontSize: 11, color: theme.colors.text.secondary } }, "Sem hist\xF3rico")));
 }
-var plugin = new import_data.PanelPlugin(Panel).setPanelOptions((builder) => builder.addTextInput({ path: "popName", name: "Nome do POP", defaultValue: "" }).addTextInput({ path: "labelA", name: "Nome do indicador A", defaultValue: "Roteador" }).addNumberInput({ path: "upA", name: "Valor UP para A", defaultValue: 1 }).addNumberInput({ path: "downA", name: "Valor DOWN para A", defaultValue: 0 }).addTextInput({ path: "labelB", name: "Nome do indicador B", defaultValue: "Energia" }).addNumberInput({ path: "upB", name: "Valor UP para B", defaultValue: 1 }).addNumberInput({ path: "downB", name: "Valor DOWN para B", defaultValue: 0 }).addNumberInput({
-  path: "validitySeconds",
-  name: "Validade dos indicadores em segundos",
-  defaultValue: 45,
-  settings: { min: 1, max: 86400 }
-}).addTextInput({ path: "chartTitle", name: "T\xEDtulo do gr\xE1fico C", defaultValue: "Tens\xE3o do banco" }).addTextInput({ path: "unit", name: "Unidade do gr\xE1fico C", defaultValue: "V" }).addSelect({
+var plugin = new import_data.PanelPlugin(Panel).setPanelOptions((builder) => builder.addTextInput({ path: "popName", name: "Nome do POP", defaultValue: "" }).addTextInput({ path: "labelA", name: "Nome do indicador A", defaultValue: "Roteador" }).addNumberInput({ path: "upA", name: "Valor UP para A", defaultValue: 1 }).addNumberInput({ path: "downA", name: "Valor DOWN para A", defaultValue: 0 }).addTextInput({ path: "labelB", name: "Nome do indicador B", defaultValue: "Energia" }).addNumberInput({ path: "upB", name: "Valor UP para B", defaultValue: 1 }).addNumberInput({ path: "downB", name: "Valor DOWN para B", defaultValue: 0 }).addTextInput({ path: "chartTitle", name: "T\xEDtulo do gr\xE1fico C", defaultValue: "Tens\xE3o do banco" }).addTextInput({ path: "unit", name: "Unidade do gr\xE1fico C", defaultValue: "V" }).addSelect({
   path: "bankVoltage",
   name: "Tens\xE3o nominal do banco",
   defaultValue: "auto",
