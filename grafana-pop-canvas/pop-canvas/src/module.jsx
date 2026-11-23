@@ -107,6 +107,9 @@ function history(data, timeRange, options, theme, timeZone) {
     }
   }
 
+  const hasLimit = valid(options.batteryLimit);
+  const normalColor = options.batteryNormalColor || '#68d851';
+  const lowColor = options.batteryLowColor || '#e02f44';
   const frame = {
     name: options.chartTitle, refId: 'C', length: times.length,
     fields: [
@@ -114,8 +117,13 @@ function history(data, timeRange, options, theme, timeZone) {
       { name: options.chartTitle, type: 'number', values, config: {
         unit: options.unit ? 'suffix: ' + options.unit : 'none',
         decimals: options.decimals,
-        color: { mode: 'fixed', fixedColor: '#68d851' },
+        color: hasLimit ? { mode: 'thresholds' } : { mode: 'fixed', fixedColor: normalColor },
+        ...(hasLimit && { thresholds: { mode: 'absolute', steps: [
+          { value: -Infinity, color: lowColor },
+          { value: options.batteryLimit, color: normalColor },
+        ] } }),
         custom: {
+          ...(hasLimit && { gradientMode: 'scheme' }),
           lineWidth: 1.5, fillOpacity: 14, drawStyle: 'line',
           showPoints: 'auto', spanNulls: false, axisBorderShow: false,
         },
@@ -125,7 +133,10 @@ function history(data, timeRange, options, theme, timeZone) {
   for (const field of frame.fields) {
     field.display = getDisplayProcessor({ field, theme, timeZone });
   }
-  return { frame, last };
+  const lastColor = hasLimit && valid(last)
+    ? theme.visualization.getColorByName(last < options.batteryLimit ? lowColor : normalColor)
+    : undefined;
+  return { frame, last, lastColor };
 }
 
 function Panel({ options, title, data, width, height, timeRange, timeZone }) {
@@ -150,7 +161,7 @@ function Panel({ options, title, data, width, height, timeRange, timeZone }) {
     return () => clearTimeout(timer);
   }, [a?.timestamp, b?.timestamp, validityMs, statusA, statusB]);
 
-  const { frame, last } = useMemo(
+  const { frame, last, lastColor } = useMemo(
     () => history(data, timeRange, options, theme, timeZone),
     [data, timeRange, options, theme, timeZone]
   );
@@ -175,7 +186,7 @@ function Panel({ options, title, data, width, height, timeRange, timeZone }) {
       }}>
         <div style={{ display: 'flex', gap: 5, justifyContent: 'space-between', lineHeight: '18px', fontSize: 11 }}>
           <span title={options.chartTitle} style={ellipsis}>{options.chartTitle}</span>
-          {latest && <strong aria-label={'Último valor ' + latest} style={{ whiteSpace: 'nowrap' }}>{latest}</strong>}
+          {latest && <strong aria-label={'Último valor ' + latest} style={{ whiteSpace: 'nowrap', color: lastColor }}>{latest}</strong>}
         </div>
         {latest ? (
           <div aria-label={options.chartTitle} tabIndex={0}>
@@ -208,6 +219,9 @@ export const plugin = new PanelPlugin(Panel).setPanelOptions((builder) => builde
     settings: { min: 1, max: 86400 } })
   .addTextInput({ path: 'chartTitle', name: 'Título do gráfico C', defaultValue: 'Tensão do banco' })
   .addTextInput({ path: 'unit', name: 'Unidade do gráfico C', defaultValue: 'V' })
+  .addNumberInput({ path: 'batteryLimit', name: 'Banco de baterias abaixo de', description: 'Na unidade do gráfico. Deixe em branco para desativar o limite.', settings: { step: 0.1 } })
+  .addColorPicker({ path: 'batteryLowColor', name: 'Cor abaixo do limite', defaultValue: '#e02f44' })
+  .addColorPicker({ path: 'batteryNormalColor', name: 'Cor padrão do banco', defaultValue: '#68d851' })
   .addNumberInput({ path: 'decimals', name: 'Casas decimais', defaultValue: 1, settings: { min: 0, max: 8 } })
   .addNumberInput({ path: 'gapSeconds', name: 'Lacuna no gráfico após segundos sem amostra', defaultValue: 22.5,
     settings: { min: 1, max: 86400 } }));

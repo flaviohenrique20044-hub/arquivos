@@ -34,7 +34,7 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
 ));
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
-// outputs/pop-lab/pop-canvas/src/module.jsx
+// pop-canvas/src/module.jsx
 var module_exports = {};
 __export(module_exports, {
   plugin: () => plugin
@@ -148,6 +148,9 @@ function history(data, timeRange, options, theme, timeZone) {
       break;
     }
   }
+  const hasLimit = valid(options.batteryLimit);
+  const normalColor = options.batteryNormalColor || "#68d851";
+  const lowColor = options.batteryLowColor || "#e02f44";
   const frame = {
     name: options.chartTitle,
     refId: "C",
@@ -157,8 +160,13 @@ function history(data, timeRange, options, theme, timeZone) {
       { name: options.chartTitle, type: "number", values, config: {
         unit: options.unit ? "suffix: " + options.unit : "none",
         decimals: options.decimals,
-        color: { mode: "fixed", fixedColor: "#68d851" },
+        color: hasLimit ? { mode: "thresholds" } : { mode: "fixed", fixedColor: normalColor },
+        ...hasLimit && { thresholds: { mode: "absolute", steps: [
+          { value: -Infinity, color: lowColor },
+          { value: options.batteryLimit, color: normalColor }
+        ] } },
         custom: {
+          ...hasLimit && { gradientMode: "scheme" },
           lineWidth: 1.5,
           fillOpacity: 14,
           drawStyle: "line",
@@ -172,7 +180,8 @@ function history(data, timeRange, options, theme, timeZone) {
   for (const field of frame.fields) {
     field.display = (0, import_data.getDisplayProcessor)({ field, theme, timeZone });
   }
-  return { frame, last };
+  const lastColor = hasLimit && valid(last) ? theme.visualization.getColorByName(last < options.batteryLimit ? lowColor : normalColor) : void 0;
+  return { frame, last, lastColor };
 }
 function Panel({ options, title, data, width, height, timeRange, timeZone }) {
   const theme = (0, import_ui.useTheme2)();
@@ -192,7 +201,7 @@ function Panel({ options, title, data, width, height, timeRange, timeZone }) {
     const timer = setTimeout(() => expire((value) => value + 1), Math.min(...deadlines) - current + 20);
     return () => clearTimeout(timer);
   }, [a?.timestamp, b?.timestamp, validityMs, statusA, statusB]);
-  const { frame, last } = (0, import_react.useMemo)(
+  const { frame, last, lastColor } = (0, import_react.useMemo)(
     () => history(data, timeRange, options, theme, timeZone),
     [data, timeRange, options, theme, timeZone]
   );
@@ -213,7 +222,7 @@ function Panel({ options, title, data, width, height, timeRange, timeZone }) {
     display: "flex",
     flexDirection: "column",
     borderTop: "1px solid " + theme.colors.border.weak
-  } }, /* @__PURE__ */ import_react.default.createElement("div", { style: { display: "flex", gap: 5, justifyContent: "space-between", lineHeight: "18px", fontSize: 11 } }, /* @__PURE__ */ import_react.default.createElement("span", { title: options.chartTitle, style: ellipsis }, options.chartTitle), latest && /* @__PURE__ */ import_react.default.createElement("strong", { "aria-label": "\xDAltimo valor " + latest, style: { whiteSpace: "nowrap" } }, latest)), latest ? /* @__PURE__ */ import_react.default.createElement("div", { "aria-label": options.chartTitle, tabIndex: 0 }, /* @__PURE__ */ import_react.default.createElement(
+  } }, /* @__PURE__ */ import_react.default.createElement("div", { style: { display: "flex", gap: 5, justifyContent: "space-between", lineHeight: "18px", fontSize: 11 } }, /* @__PURE__ */ import_react.default.createElement("span", { title: options.chartTitle, style: ellipsis }, options.chartTitle), latest && /* @__PURE__ */ import_react.default.createElement("strong", { "aria-label": "\xDAltimo valor " + latest, style: { whiteSpace: "nowrap", color: lastColor } }, latest)), latest ? /* @__PURE__ */ import_react.default.createElement("div", { "aria-label": options.chartTitle, tabIndex: 0 }, /* @__PURE__ */ import_react.default.createElement(
     import_ui.TimeSeries,
     {
       frames,
@@ -231,7 +240,7 @@ var plugin = new import_data.PanelPlugin(Panel).setPanelOptions((builder) => bui
   name: "Validade dos indicadores em segundos",
   defaultValue: 45,
   settings: { min: 1, max: 86400 }
-}).addTextInput({ path: "chartTitle", name: "T\xEDtulo do gr\xE1fico C", defaultValue: "Tens\xE3o do banco" }).addTextInput({ path: "unit", name: "Unidade do gr\xE1fico C", defaultValue: "V" }).addNumberInput({ path: "decimals", name: "Casas decimais", defaultValue: 1, settings: { min: 0, max: 8 } }).addNumberInput({
+}).addTextInput({ path: "chartTitle", name: "T\xEDtulo do gr\xE1fico C", defaultValue: "Tens\xE3o do banco" }).addTextInput({ path: "unit", name: "Unidade do gr\xE1fico C", defaultValue: "V" }).addNumberInput({ path: "batteryLimit", name: "Banco de baterias abaixo de", description: "Na unidade do gr\xE1fico. Deixe em branco para desativar o limite.", settings: { step: 0.1 } }).addColorPicker({ path: "batteryLowColor", name: "Cor abaixo do limite", defaultValue: "#e02f44" }).addColorPicker({ path: "batteryNormalColor", name: "Cor padr\xE3o do banco", defaultValue: "#68d851" }).addNumberInput({ path: "decimals", name: "Casas decimais", defaultValue: 1, settings: { min: 0, max: 8 } }).addNumberInput({
   path: "gapSeconds",
   name: "Lacuna no gr\xE1fico ap\xF3s segundos sem amostra",
   defaultValue: 22.5,
