@@ -146,6 +146,23 @@ function history(data, timeRange, options, theme, timeZone) {
   return { frame, last, lastColor };
 }
 
+function latestTemperature(data, timeRange) {
+  let latestTime = -Infinity;
+  let temperature;
+  const from = timeRange.from.valueOf();
+  const to = timeRange.to.valueOf();
+  for (const { time, value } of series(data, 'D')) {
+    time.values.forEach((timestamp, index) => {
+      const reading = value.values[index];
+      if (valid(timestamp) && timestamp >= from && timestamp <= to && timestamp >= latestTime && valid(reading)) {
+        latestTime = timestamp;
+        temperature = reading;
+      }
+    });
+  }
+  return temperature;
+}
+
 function Panel({ options, title, data, width, height, timeRange, timeZone }) {
   const theme = useTheme2();
   const statusA = useIndicator(data, 'A', options.upA, options.downA, options.popName, timeRange);
@@ -160,16 +177,20 @@ function Panel({ options, title, data, width, height, timeRange, timeZone }) {
     maximumFractionDigits: options.decimals, minimumFractionDigits: options.decimals,
   }).format(last) + (options.unit ? ' ' + options.unit : '') : null;
   const name = options.popName || title || 'POP Canvas';
+  const temperature = useMemo(() => latestTemperature(data, timeRange), [data, timeRange]);
+  const temperatureText = valid(temperature)
+    ? temperature.toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + ' °C'
+    : '';
   return (
     <article aria-label={name} style={{
       ...container, color: theme.colors.text.primary, background: theme.colors.background.secondary,
       borderColor: theme.colors.border.medium,
     }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 4, height: rowHeight, flexShrink: 0 }}>
-        <strong title={name} style={{ ...ellipsis, fontSize: 15 }}>{name}</strong>
-        {latest && <strong title={options.chartTitle} aria-label={'Último valor ' + latest} style={{
-          whiteSpace: 'nowrap', fontSize: 16, color: lastColor,
-        }}>{latest}</strong>}
+      <div style={{ display: 'grid', alignItems: 'center', gridTemplateColumns: temperatureText ? 'min(23%, 58px) minmax(0, 1fr) min(23%, 58px)' : '1fr', height: rowHeight, flexShrink: 0 }}>
+        <strong title={name} style={{ ...ellipsis, gridColumn: temperatureText ? 2 : 1, textAlign: 'center', fontSize: 15 }}>{name}</strong>
+        {temperatureText && <strong title={'Temperatura: ' + temperatureText} style={{
+          ...ellipsis, textAlign: 'right', fontSize: 13,
+        }}>{temperatureText}</strong>}
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 0, borderRadius: 3, overflow: 'hidden', height: rowHeight, flexShrink: 0 }}>
         <Indicator label={options.labelA} status={options.routerInstalled === false ? 'Não instalado' : statusA} />
@@ -177,7 +198,7 @@ function Panel({ options, title, data, width, height, timeRange, timeZone }) {
       </div>
       <div style={{ minHeight: 0, flex: 1, display: 'flex', flexDirection: 'column' }}>
         {latest ? (
-          <div aria-label={options.chartTitle} tabIndex={0}>
+          <div aria-label={options.chartTitle} tabIndex={0} style={{ position: 'relative', flex: 1, minHeight: 0 }}>
             <TimeSeries frames={frames} width={Math.max(1, width - 2 * (paddingX + 1))}
               height={Math.max(1, height - 2 * (rowHeight + gap + paddingY + 1))}
               timeRange={timeRange} timeZone={timeZone} legend={legend}>
@@ -185,6 +206,11 @@ function Panel({ options, title, data, width, height, timeRange, timeZone }) {
                 <TooltipPlugin config={config} data={alignedFrame} frames={frames} timeZone={timeZone} />
               )}
             </TimeSeries>
+            <strong aria-label={'Último valor ' + latest} style={{
+              position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
+              pointerEvents: 'none', whiteSpace: 'nowrap', fontSize: 16, lineHeight: 1.1,
+              color: lastColor, textShadow: '0 0 3px ' + theme.colors.background.secondary,
+            }}>{latest}</strong>
           </div>
         ) : (
           <div style={{ flex: 1, display: 'grid', placeItems: 'center', fontSize: 11, color: theme.colors.text.secondary }}>

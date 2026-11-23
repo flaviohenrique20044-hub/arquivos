@@ -193,6 +193,22 @@ function history(data, timeRange, options, theme, timeZone) {
   const lastColor = hasLimit && valid(last) ? theme.visualization.getColorByName(chartColor) : void 0;
   return { frame, last, lastColor };
 }
+function latestTemperature(data, timeRange) {
+  let latestTime = -Infinity;
+  let temperature;
+  const from = timeRange.from.valueOf();
+  const to = timeRange.to.valueOf();
+  for (const { time, value } of series(data, "D")) {
+    time.values.forEach((timestamp, index) => {
+      const reading = value.values[index];
+      if (valid(timestamp) && timestamp >= from && timestamp <= to && timestamp >= latestTime && valid(reading)) {
+        latestTime = timestamp;
+        temperature = reading;
+      }
+    });
+  }
+  return temperature;
+}
 function Panel({ options, title, data, width, height, timeRange, timeZone }) {
   const theme = (0, import_ui.useTheme2)();
   const statusA = useIndicator(data, "A", options.upA, options.downA, options.popName, timeRange);
@@ -207,16 +223,18 @@ function Panel({ options, title, data, width, height, timeRange, timeZone }) {
     minimumFractionDigits: options.decimals
   }).format(last) + (options.unit ? " " + options.unit : "") : null;
   const name = options.popName || title || "POP Canvas";
+  const temperature = (0, import_react.useMemo)(() => latestTemperature(data, timeRange), [data, timeRange]);
+  const temperatureText = valid(temperature) ? temperature.toLocaleString("pt-BR", { maximumFractionDigits: 1 }) + " \xB0C" : "";
   return /* @__PURE__ */ import_react.default.createElement("article", { "aria-label": name, style: {
     ...container,
     color: theme.colors.text.primary,
     background: theme.colors.background.secondary,
     borderColor: theme.colors.border.medium
-  } }, /* @__PURE__ */ import_react.default.createElement("div", { style: { display: "flex", alignItems: "center", justifyContent: "space-between", gap: 4, height: rowHeight, flexShrink: 0 } }, /* @__PURE__ */ import_react.default.createElement("strong", { title: name, style: { ...ellipsis, fontSize: 15 } }, name), latest && /* @__PURE__ */ import_react.default.createElement("strong", { title: options.chartTitle, "aria-label": "\xDAltimo valor " + latest, style: {
-    whiteSpace: "nowrap",
-    fontSize: 16,
-    color: lastColor
-  } }, latest)), /* @__PURE__ */ import_react.default.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 0, borderRadius: 3, overflow: "hidden", height: rowHeight, flexShrink: 0 } }, /* @__PURE__ */ import_react.default.createElement(Indicator, { label: options.labelA, status: options.routerInstalled === false ? "N\xE3o instalado" : statusA }), /* @__PURE__ */ import_react.default.createElement(Indicator, { label: options.labelB, status: statusB })), /* @__PURE__ */ import_react.default.createElement("div", { style: { minHeight: 0, flex: 1, display: "flex", flexDirection: "column" } }, latest ? /* @__PURE__ */ import_react.default.createElement("div", { "aria-label": options.chartTitle, tabIndex: 0 }, /* @__PURE__ */ import_react.default.createElement(
+  } }, /* @__PURE__ */ import_react.default.createElement("div", { style: { display: "grid", alignItems: "center", gridTemplateColumns: temperatureText ? "min(23%, 58px) minmax(0, 1fr) min(23%, 58px)" : "1fr", height: rowHeight, flexShrink: 0 } }, /* @__PURE__ */ import_react.default.createElement("strong", { title: name, style: { ...ellipsis, gridColumn: temperatureText ? 2 : 1, textAlign: "center", fontSize: 15 } }, name), temperatureText && /* @__PURE__ */ import_react.default.createElement("strong", { title: "Temperatura: " + temperatureText, style: {
+    ...ellipsis,
+    textAlign: "right",
+    fontSize: 13
+  } }, temperatureText)), /* @__PURE__ */ import_react.default.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 0, borderRadius: 3, overflow: "hidden", height: rowHeight, flexShrink: 0 } }, /* @__PURE__ */ import_react.default.createElement(Indicator, { label: options.labelA, status: options.routerInstalled === false ? "N\xE3o instalado" : statusA }), /* @__PURE__ */ import_react.default.createElement(Indicator, { label: options.labelB, status: statusB })), /* @__PURE__ */ import_react.default.createElement("div", { style: { minHeight: 0, flex: 1, display: "flex", flexDirection: "column" } }, latest ? /* @__PURE__ */ import_react.default.createElement("div", { "aria-label": options.chartTitle, tabIndex: 0, style: { position: "relative", flex: 1, minHeight: 0 } }, /* @__PURE__ */ import_react.default.createElement(
     import_ui.TimeSeries,
     {
       frames,
@@ -227,7 +245,18 @@ function Panel({ options, title, data, width, height, timeRange, timeZone }) {
       legend
     },
     (config, alignedFrame) => /* @__PURE__ */ import_react.default.createElement(import_ui.TooltipPlugin, { config, data: alignedFrame, frames, timeZone })
-  )) : /* @__PURE__ */ import_react.default.createElement("div", { style: { flex: 1, display: "grid", placeItems: "center", fontSize: 11, color: theme.colors.text.secondary } }, "Sem hist\xF3rico")));
+  ), /* @__PURE__ */ import_react.default.createElement("strong", { "aria-label": "\xDAltimo valor " + latest, style: {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    pointerEvents: "none",
+    whiteSpace: "nowrap",
+    fontSize: 16,
+    lineHeight: 1.1,
+    color: lastColor,
+    textShadow: "0 0 3px " + theme.colors.background.secondary
+  } }, latest)) : /* @__PURE__ */ import_react.default.createElement("div", { style: { flex: 1, display: "grid", placeItems: "center", fontSize: 11, color: theme.colors.text.secondary } }, "Sem hist\xF3rico")));
 }
 var plugin = new import_data.PanelPlugin(Panel).setPanelOptions((builder) => builder.addTextInput({ path: "popName", name: "Nome do POP", defaultValue: "" }).addTextInput({ path: "labelA", name: "Nome do indicador A", defaultValue: "Roteador" }).addBooleanSwitch({ path: "routerInstalled", name: "Roteador do POP adicionado?", defaultValue: true }).addNumberInput({ path: "upA", name: "Valor UP para A", defaultValue: 1 }).addNumberInput({ path: "downA", name: "Valor DOWN para A", defaultValue: 0 }).addTextInput({ path: "labelB", name: "Nome do indicador B", defaultValue: "Energia" }).addNumberInput({ path: "upB", name: "Valor UP para B", defaultValue: 1 }).addNumberInput({ path: "downB", name: "Valor DOWN para B", defaultValue: 0 }).addTextInput({ path: "chartTitle", name: "T\xEDtulo do gr\xE1fico C", defaultValue: "Tens\xE3o do banco" }).addTextInput({ path: "unit", name: "Unidade do gr\xE1fico C", defaultValue: "V" }).addSelect({
   path: "bankVoltage",
