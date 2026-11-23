@@ -118,6 +118,7 @@ function history(data, timeRange, options, theme, timeZone) {
   const scale = voltageScales.get(options.bankVoltage);
   const normalColor = options.batteryNormalColor || '#68d851';
   const lowColor = options.batteryLowColor || '#e02f44';
+  const chartColor = hasLimit && valid(last) && last < options.batteryLimit ? lowColor : normalColor;
   const frame = {
     name: options.chartTitle, refId: 'C', length: times.length,
     fields: [
@@ -125,14 +126,9 @@ function history(data, timeRange, options, theme, timeZone) {
       { name: options.chartTitle, type: 'number', values, config: {
         unit: options.unit ? 'suffix: ' + options.unit : 'none',
         decimals: options.decimals,
-        color: hasLimit ? { mode: 'thresholds' } : { mode: 'fixed', fixedColor: normalColor },
-        ...(hasLimit && { thresholds: { mode: 'absolute', steps: [
-          { value: -Infinity, color: lowColor },
-          { value: options.batteryLimit, color: normalColor },
-        ] } }),
+        color: { mode: 'fixed', fixedColor: chartColor },
         custom: {
           ...(scale && { axisSoftMin: scale.min, axisSoftMax: scale.max }),
-          ...(hasLimit && { gradientMode: 'scheme' }),
           lineWidth: 1.5, fillOpacity: 14, drawStyle: 'line',
           showPoints: 'auto', spanNulls: false, axisBorderShow: false,
         },
@@ -143,7 +139,7 @@ function history(data, timeRange, options, theme, timeZone) {
     field.display = getDisplayProcessor({ field, theme, timeZone });
   }
   const lastColor = hasLimit && valid(last)
-    ? theme.visualization.getColorByName(last < options.batteryLimit ? lowColor : normalColor)
+    ? theme.visualization.getColorByName(chartColor)
     : undefined;
   return { frame, last, lastColor };
 }
