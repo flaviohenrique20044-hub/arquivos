@@ -114,11 +114,10 @@ function Indicator({ label, status }) {
     textAlign: "center",
     lineHeight: rowHeight + "px",
     padding: "0 4px",
-    borderRadius: 4,
     color: "#fff",
     background: colors[status],
-    fontSize: 12,
-    fontWeight: 750
+    fontSize: 15,
+    fontWeight: 700
   } }, label);
 }
 function history(data, timeRange, options, theme, timeZone) {
@@ -178,7 +177,7 @@ function history(data, timeRange, options, theme, timeZone) {
           ...scale && { axisSoftMin: scale.min, axisSoftMax: scale.max },
           axisPlacement: "hidden",
           axisGridShow: false,
-          lineWidth: 1.5,
+          lineWidth: 2,
           fillOpacity: 14,
           drawStyle: "line",
           showPoints: "auto",
@@ -213,11 +212,11 @@ function Panel({ options, title, data, width, height, timeRange, timeZone }) {
     color: theme.colors.text.primary,
     background: theme.colors.background.secondary,
     borderColor: theme.colors.border.medium
-  } }, /* @__PURE__ */ import_react.default.createElement("div", { style: { display: "flex", alignItems: "center", justifyContent: "space-between", gap: 4, height: rowHeight, flexShrink: 0 } }, /* @__PURE__ */ import_react.default.createElement("strong", { title: name, style: { ...ellipsis, fontSize: 13 } }, name), latest && /* @__PURE__ */ import_react.default.createElement("strong", { title: options.chartTitle, "aria-label": "\xDAltimo valor " + latest, style: {
+  } }, /* @__PURE__ */ import_react.default.createElement("div", { style: { display: "flex", alignItems: "center", justifyContent: "space-between", gap: 4, height: rowHeight, flexShrink: 0 } }, /* @__PURE__ */ import_react.default.createElement("strong", { title: name, style: { ...ellipsis, fontSize: 15 } }, name), latest && /* @__PURE__ */ import_react.default.createElement("strong", { title: options.chartTitle, "aria-label": "\xDAltimo valor " + latest, style: {
     whiteSpace: "nowrap",
-    fontSize: 14,
+    fontSize: 16,
     color: lastColor
-  } }, latest)), /* @__PURE__ */ import_react.default.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 4, height: rowHeight, flexShrink: 0 } }, /* @__PURE__ */ import_react.default.createElement(Indicator, { label: options.labelA, status: options.routerInstalled === false ? "N\xE3o instalado" : statusA }), /* @__PURE__ */ import_react.default.createElement(Indicator, { label: options.labelB, status: statusB })), /* @__PURE__ */ import_react.default.createElement("div", { style: { minHeight: 0, flex: 1, display: "flex", flexDirection: "column" } }, latest ? /* @__PURE__ */ import_react.default.createElement("div", { "aria-label": options.chartTitle, tabIndex: 0 }, /* @__PURE__ */ import_react.default.createElement(
+  } }, latest)), /* @__PURE__ */ import_react.default.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 0, borderRadius: 3, overflow: "hidden", height: rowHeight, flexShrink: 0 } }, /* @__PURE__ */ import_react.default.createElement(Indicator, { label: options.labelA, status: options.routerInstalled === false ? "N\xE3o instalado" : statusA }), /* @__PURE__ */ import_react.default.createElement(Indicator, { label: options.labelB, status: statusB })), /* @__PURE__ */ import_react.default.createElement("div", { style: { minHeight: 0, flex: 1, display: "flex", flexDirection: "column" } }, latest ? /* @__PURE__ */ import_react.default.createElement("div", { "aria-label": options.chartTitle, tabIndex: 0 }, /* @__PURE__ */ import_react.default.createElement(
     import_ui.TimeSeries,
     {
       frames,

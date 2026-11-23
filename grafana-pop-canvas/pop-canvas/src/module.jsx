@@ -69,8 +69,8 @@ function Indicator({ label, status }) {
   return (
     <div title={label + ' · ' + status} aria-label={label + ' ' + status} style={{
       ...ellipsis, minWidth: 0, textAlign: 'center', lineHeight: rowHeight + 'px',
-      padding: '0 4px', borderRadius: 4, color: '#fff', background: colors[status],
-      fontSize: 12, fontWeight: 750,
+      padding: '0 4px', color: '#fff', background: colors[status],
+      fontSize: 15, fontWeight: 700,
     }}>{label}</div>
   );
 }
@@ -131,7 +131,7 @@ function history(data, timeRange, options, theme, timeZone) {
         custom: {
           ...(scale && { axisSoftMin: scale.min, axisSoftMax: scale.max }),
           axisPlacement: 'hidden', axisGridShow: false,
-          lineWidth: 1.5, fillOpacity: 14, drawStyle: 'line',
+          lineWidth: 2, fillOpacity: 14, drawStyle: 'line',
           showPoints: 'auto', spanNulls: false, axisBorderShow: false,
         },
       } },
@@ -166,12 +166,12 @@ function Panel({ options, title, data, width, height, timeRange, timeZone }) {
       borderColor: theme.colors.border.medium,
     }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 4, height: rowHeight, flexShrink: 0 }}>
-        <strong title={name} style={{ ...ellipsis, fontSize: 13 }}>{name}</strong>
+        <strong title={name} style={{ ...ellipsis, fontSize: 15 }}>{name}</strong>
         {latest && <strong title={options.chartTitle} aria-label={'Último valor ' + latest} style={{
-          whiteSpace: 'nowrap', fontSize: 14, color: lastColor,
+          whiteSpace: 'nowrap', fontSize: 16, color: lastColor,
         }}>{latest}</strong>}
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 4, height: rowHeight, flexShrink: 0 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 0, borderRadius: 3, overflow: 'hidden', height: rowHeight, flexShrink: 0 }}>
         <Indicator label={options.labelA} status={options.routerInstalled === false ? 'Não instalado' : statusA} />
         <Indicator label={options.labelB} status={statusB} />
       </div>
