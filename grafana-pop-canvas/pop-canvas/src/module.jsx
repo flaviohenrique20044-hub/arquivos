@@ -9,7 +9,7 @@ const container = {
   display: 'flex', flexDirection: 'column', gap: 4,
 };
 const ellipsis = { overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' };
-const colors = { UP: '#147c27', DOWN: '#c62235', 'N/D': '#515968' };
+const colors = { UP: '#147c27', DOWN: '#c62235', 'N/D': '#515968', 'Não instalado': '#245caa' };
 const valid = (value) => typeof value === 'number' && Number.isFinite(value);
 const voltageScales = new Map([
   ['12', { min: 10, max: 13 }],
@@ -169,7 +169,7 @@ function Panel({ options, title, data, width, height, timeRange, timeZone }) {
     }}>
       <div title={name} style={{ ...ellipsis, flexShrink: 0, lineHeight: '17px', fontWeight: 750 }}>{name}</div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 4, flexShrink: 0 }}>
-        <Indicator label={options.labelA} status={statusA} />
+        <Indicator label={options.labelA} status={options.routerInstalled === false ? 'Não instalado' : statusA} />
         <Indicator label={options.labelB} status={statusB} />
       </div>
       <div style={{
@@ -202,6 +202,7 @@ function Panel({ options, title, data, width, height, timeRange, timeZone }) {
 export const plugin = new PanelPlugin(Panel).setPanelOptions((builder) => builder
   .addTextInput({ path: 'popName', name: 'Nome do POP', defaultValue: '' })
   .addTextInput({ path: 'labelA', name: 'Nome do indicador A', defaultValue: 'Roteador' })
+  .addBooleanSwitch({ path: 'routerInstalled', name: 'Roteador do POP adicionado?', defaultValue: true })
   .addNumberInput({ path: 'upA', name: 'Valor UP para A', defaultValue: 1 })
   .addNumberInput({ path: 'downA', name: 'Valor DOWN para A', defaultValue: 0 })
   .addTextInput({ path: 'labelB', name: 'Nome do indicador B', defaultValue: 'Energia' })

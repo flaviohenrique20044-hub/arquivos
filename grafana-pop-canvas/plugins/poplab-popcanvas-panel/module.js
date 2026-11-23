@@ -57,7 +57,7 @@ var container = {
   gap: 4
 };
 var ellipsis = { overflow: "hidden", whiteSpace: "nowrap", textOverflow: "ellipsis" };
-var colors = { UP: "#147c27", DOWN: "#c62235", "N/D": "#515968" };
+var colors = { UP: "#147c27", DOWN: "#c62235", "N/D": "#515968", "N\xE3o instalado": "#245caa" };
 var valid = (value) => typeof value === "number" && Number.isFinite(value);
 var voltageScales = /* @__PURE__ */ new Map([
   ["12", { min: 10, max: 13 }],
@@ -211,7 +211,7 @@ function Panel({ options, title, data, width, height, timeRange, timeZone }) {
     color: theme.colors.text.primary,
     background: theme.colors.background.secondary,
     borderColor: theme.colors.border.medium
-  } }, /* @__PURE__ */ import_react.default.createElement("div", { title: name, style: { ...ellipsis, flexShrink: 0, lineHeight: "17px", fontWeight: 750 } }, name), /* @__PURE__ */ import_react.default.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 4, flexShrink: 0 } }, /* @__PURE__ */ import_react.default.createElement(Indicator, { label: options.labelA, status: statusA }), /* @__PURE__ */ import_react.default.createElement(Indicator, { label: options.labelB, status: statusB })), /* @__PURE__ */ import_react.default.createElement("div", { style: {
+  } }, /* @__PURE__ */ import_react.default.createElement("div", { title: name, style: { ...ellipsis, flexShrink: 0, lineHeight: "17px", fontWeight: 750 } }, name), /* @__PURE__ */ import_react.default.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 4, flexShrink: 0 } }, /* @__PURE__ */ import_react.default.createElement(Indicator, { label: options.labelA, status: options.routerInstalled === false ? "N\xE3o instalado" : statusA }), /* @__PURE__ */ import_react.default.createElement(Indicator, { label: options.labelB, status: statusB })), /* @__PURE__ */ import_react.default.createElement("div", { style: {
     minHeight: 0,
     flex: 1,
     display: "flex",
@@ -230,7 +230,7 @@ function Panel({ options, title, data, width, height, timeRange, timeZone }) {
     (config, alignedFrame) => /* @__PURE__ */ import_react.default.createElement(import_ui.TooltipPlugin, { config, data: alignedFrame, frames, timeZone })
   )) : /* @__PURE__ */ import_react.default.createElement("div", { style: { flex: 1, display: "grid", placeItems: "center", fontSize: 11, color: theme.colors.text.secondary } }, "Sem hist\xF3rico")));
 }
-var plugin = new import_data.PanelPlugin(Panel).setPanelOptions((builder) => builder.addTextInput({ path: "popName", name: "Nome do POP", defaultValue: "" }).addTextInput({ path: "labelA", name: "Nome do indicador A", defaultValue: "Roteador" }).addNumberInput({ path: "upA", name: "Valor UP para A", defaultValue: 1 }).addNumberInput({ path: "downA", name: "Valor DOWN para A", defaultValue: 0 }).addTextInput({ path: "labelB", name: "Nome do indicador B", defaultValue: "Energia" }).addNumberInput({ path: "upB", name: "Valor UP para B", defaultValue: 1 }).addNumberInput({ path: "downB", name: "Valor DOWN para B", defaultValue: 0 }).addTextInput({ path: "chartTitle", name: "T\xEDtulo do gr\xE1fico C", defaultValue: "Tens\xE3o do banco" }).addTextInput({ path: "unit", name: "Unidade do gr\xE1fico C", defaultValue: "V" }).addSelect({
+var plugin = new import_data.PanelPlugin(Panel).setPanelOptions((builder) => builder.addTextInput({ path: "popName", name: "Nome do POP", defaultValue: "" }).addTextInput({ path: "labelA", name: "Nome do indicador A", defaultValue: "Roteador" }).addBooleanSwitch({ path: "routerInstalled", name: "Roteador do POP adicionado?", defaultValue: true }).addNumberInput({ path: "upA", name: "Valor UP para A", defaultValue: 1 }).addNumberInput({ path: "downA", name: "Valor DOWN para A", defaultValue: 0 }).addTextInput({ path: "labelB", name: "Nome do indicador B", defaultValue: "Energia" }).addNumberInput({ path: "upB", name: "Valor UP para B", defaultValue: 1 }).addNumberInput({ path: "downB", name: "Valor DOWN para B", defaultValue: 0 }).addTextInput({ path: "chartTitle", name: "T\xEDtulo do gr\xE1fico C", defaultValue: "Tens\xE3o do banco" }).addTextInput({ path: "unit", name: "Unidade do gr\xE1fico C", defaultValue: "V" }).addSelect({
   path: "bankVoltage",
   name: "Tens\xE3o nominal do banco",
   defaultValue: "auto",
