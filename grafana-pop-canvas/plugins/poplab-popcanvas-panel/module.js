@@ -44,17 +44,21 @@ var import_react = __toESM(require("react"));
 var import_data = require("@grafana/data");
 var import_ui = require("@grafana/ui");
 var legend = { showLegend: false };
+var rowHeight = 18;
+var gap = 2;
+var paddingY = 3;
+var paddingX = 5;
 var container = {
   boxSizing: "border-box",
   height: "100%",
   width: "100%",
-  padding: "5px 7px",
+  padding: `${paddingY}px ${paddingX}px`,
   border: "1px solid",
   borderRadius: 6,
   overflow: "hidden",
   display: "flex",
   flexDirection: "column",
-  gap: 4
+  gap
 };
 var ellipsis = { overflow: "hidden", whiteSpace: "nowrap", textOverflow: "ellipsis" };
 var colors = { UP: "#147c27", DOWN: "#c62235", "N/D": "#515968", "N\xE3o instalado": "#245caa" };
@@ -104,18 +108,18 @@ function useIndicator(data, refId, up, down, popName, timeRange) {
   return latest.value === up ? "UP" : "DOWN";
 }
 function Indicator({ label, status }) {
-  return /* @__PURE__ */ import_react.default.createElement("div", { style: { minWidth: 0, textAlign: "center" } }, /* @__PURE__ */ import_react.default.createElement("div", { "aria-label": label + " " + status, style: {
-    display: "inline-grid",
-    placeItems: "center",
-    minWidth: 42,
-    height: 25,
-    padding: "0 5px",
+  return /* @__PURE__ */ import_react.default.createElement("div", { title: label + " \xB7 " + status, "aria-label": label + " " + status, style: {
+    ...ellipsis,
+    minWidth: 0,
+    textAlign: "center",
+    lineHeight: rowHeight + "px",
+    padding: "0 4px",
     borderRadius: 4,
     color: "#fff",
     background: colors[status],
     fontSize: 12,
     fontWeight: 750
-  } }, status), /* @__PURE__ */ import_react.default.createElement("div", { title: label, style: { ...ellipsis, fontSize: 11, lineHeight: "15px" } }, label));
+  } }, label);
 }
 function history(data, timeRange, options, theme, timeZone) {
   const entry = series(data, "C")[0];
@@ -125,7 +129,7 @@ function history(data, timeRange, options, theme, timeZone) {
   const from = timeRange.from.valueOf();
   const to = timeRange.to.valueOf();
   const step = entry.time.config.interval ?? data.request?.intervalMs ?? 0;
-  const gap = Math.max(options.gapSeconds * 1e3, step * 1.5);
+  const gap2 = Math.max(options.gapSeconds * 1e3, step * 1.5);
   const points = entry.time.values.flatMap((timestamp, index) => {
     if (!valid(timestamp) || timestamp < from || timestamp > to) {
       return [];
@@ -141,7 +145,7 @@ function history(data, timeRange, options, theme, timeZone) {
     if (timestamp === prev) {
       values[values.length - 1] = value;
     } else {
-      if (prev !== void 0 && timestamp - prev > gap) {
+      if (prev !== void 0 && timestamp - prev > gap2) {
         times.push(prev + (timestamp - prev) / 2);
         values.push(null);
       }
@@ -165,13 +169,15 @@ function history(data, timeRange, options, theme, timeZone) {
     refId: "C",
     length: times.length,
     fields: [
-      { name: "Time", type: "time", config: {}, values: times },
+      { name: "Time", type: "time", config: { custom: { axisPlacement: "hidden", axisGridShow: false } }, values: times },
       { name: options.chartTitle, type: "number", values, config: {
         unit: options.unit ? "suffix: " + options.unit : "none",
         decimals: options.decimals,
         color: { mode: "fixed", fixedColor: chartColor },
         custom: {
           ...scale && { axisSoftMin: scale.min, axisSoftMax: scale.max },
+          axisPlacement: "hidden",
+          axisGridShow: false,
           lineWidth: 1.5,
           fillOpacity: 14,
           drawStyle: "line",
@@ -207,18 +213,16 @@ function Panel({ options, title, data, width, height, timeRange, timeZone }) {
     color: theme.colors.text.primary,
     background: theme.colors.background.secondary,
     borderColor: theme.colors.border.medium
-  } }, /* @__PURE__ */ import_react.default.createElement("div", { title: name, style: { ...ellipsis, flexShrink: 0, lineHeight: "17px", fontWeight: 750 } }, name), /* @__PURE__ */ import_react.default.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 4, flexShrink: 0 } }, /* @__PURE__ */ import_react.default.createElement(Indicator, { label: options.labelA, status: options.routerInstalled === false ? "N\xE3o instalado" : statusA }), /* @__PURE__ */ import_react.default.createElement(Indicator, { label: options.labelB, status: statusB })), /* @__PURE__ */ import_react.default.createElement("div", { style: {
-    minHeight: 0,
-    flex: 1,
-    display: "flex",
-    flexDirection: "column",
-    borderTop: "1px solid " + theme.colors.border.weak
-  } }, /* @__PURE__ */ import_react.default.createElement("div", { style: { display: "flex", gap: 5, justifyContent: "space-between", lineHeight: "18px", fontSize: 11 } }, /* @__PURE__ */ import_react.default.createElement("span", { title: options.chartTitle, style: ellipsis }, options.chartTitle), latest && /* @__PURE__ */ import_react.default.createElement("strong", { "aria-label": "\xDAltimo valor " + latest, style: { whiteSpace: "nowrap", color: lastColor } }, latest)), latest ? /* @__PURE__ */ import_react.default.createElement("div", { "aria-label": options.chartTitle, tabIndex: 0 }, /* @__PURE__ */ import_react.default.createElement(
+  } }, /* @__PURE__ */ import_react.default.createElement("div", { style: { display: "flex", alignItems: "center", justifyContent: "space-between", gap: 4, height: rowHeight, flexShrink: 0 } }, /* @__PURE__ */ import_react.default.createElement("strong", { title: name, style: { ...ellipsis, fontSize: 13 } }, name), latest && /* @__PURE__ */ import_react.default.createElement("strong", { title: options.chartTitle, "aria-label": "\xDAltimo valor " + latest, style: {
+    whiteSpace: "nowrap",
+    fontSize: 14,
+    color: lastColor
+  } }, latest)), /* @__PURE__ */ import_react.default.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 4, height: rowHeight, flexShrink: 0 } }, /* @__PURE__ */ import_react.default.createElement(Indicator, { label: options.labelA, status: options.routerInstalled === false ? "N\xE3o instalado" : statusA }), /* @__PURE__ */ import_react.default.createElement(Indicator, { label: options.labelB, status: statusB })), /* @__PURE__ */ import_react.default.createElement("div", { style: { minHeight: 0, flex: 1, display: "flex", flexDirection: "column" } }, latest ? /* @__PURE__ */ import_react.default.createElement("div", { "aria-label": options.chartTitle, tabIndex: 0 }, /* @__PURE__ */ import_react.default.createElement(
     import_ui.TimeSeries,
     {
       frames,
-      width: Math.max(60, width - 16),
-      height: Math.max(24, height - 104),
+      width: Math.max(1, width - 2 * (paddingX + 1)),
+      height: Math.max(1, height - 2 * (rowHeight + gap + paddingY + 1)),
       timeRange,
       timeZone,
       legend

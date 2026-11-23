@@ -3,10 +3,14 @@ import { getDisplayProcessor, PanelPlugin } from '@grafana/data';
 import { TimeSeries, TooltipPlugin, useTheme2 } from '@grafana/ui';
 
 const legend = { showLegend: false };
+const rowHeight = 18;
+const gap = 2;
+const paddingY = 3;
+const paddingX = 5;
 const container = {
-  boxSizing: 'border-box', height: '100%', width: '100%', padding: '5px 7px',
+  boxSizing: 'border-box', height: '100%', width: '100%', padding: `${paddingY}px ${paddingX}px`,
   border: '1px solid', borderRadius: 6, overflow: 'hidden',
-  display: 'flex', flexDirection: 'column', gap: 4,
+  display: 'flex', flexDirection: 'column', gap,
 };
 const ellipsis = { overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' };
 const colors = { UP: '#147c27', DOWN: '#c62235', 'N/D': '#515968', 'Não instalado': '#245caa' };
@@ -63,14 +67,11 @@ function useIndicator(data, refId, up, down, popName, timeRange) {
 
 function Indicator({ label, status }) {
   return (
-    <div style={{ minWidth: 0, textAlign: 'center' }}>
-      <div aria-label={label + ' ' + status} style={{
-        display: 'inline-grid', placeItems: 'center', minWidth: 42, height: 25,
-        padding: '0 5px', borderRadius: 4, color: '#fff', background: colors[status],
-        fontSize: 12, fontWeight: 750,
-      }}>{status}</div>
-      <div title={label} style={{ ...ellipsis, fontSize: 11, lineHeight: '15px' }}>{label}</div>
-    </div>
+    <div title={label + ' · ' + status} aria-label={label + ' ' + status} style={{
+      ...ellipsis, minWidth: 0, textAlign: 'center', lineHeight: rowHeight + 'px',
+      padding: '0 4px', borderRadius: 4, color: '#fff', background: colors[status],
+      fontSize: 12, fontWeight: 750,
+    }}>{label}</div>
   );
 }
 
@@ -122,13 +123,14 @@ function history(data, timeRange, options, theme, timeZone) {
   const frame = {
     name: options.chartTitle, refId: 'C', length: times.length,
     fields: [
-      { name: 'Time', type: 'time', config: {}, values: times },
+      { name: 'Time', type: 'time', config: { custom: { axisPlacement: 'hidden', axisGridShow: false } }, values: times },
       { name: options.chartTitle, type: 'number', values, config: {
         unit: options.unit ? 'suffix: ' + options.unit : 'none',
         decimals: options.decimals,
         color: { mode: 'fixed', fixedColor: chartColor },
         custom: {
           ...(scale && { axisSoftMin: scale.min, axisSoftMax: scale.max }),
+          axisPlacement: 'hidden', axisGridShow: false,
           lineWidth: 1.5, fillOpacity: 14, drawStyle: 'line',
           showPoints: 'auto', spanNulls: false, axisBorderShow: false,
         },
@@ -163,22 +165,21 @@ function Panel({ options, title, data, width, height, timeRange, timeZone }) {
       ...container, color: theme.colors.text.primary, background: theme.colors.background.secondary,
       borderColor: theme.colors.border.medium,
     }}>
-      <div title={name} style={{ ...ellipsis, flexShrink: 0, lineHeight: '17px', fontWeight: 750 }}>{name}</div>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 4, flexShrink: 0 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 4, height: rowHeight, flexShrink: 0 }}>
+        <strong title={name} style={{ ...ellipsis, fontSize: 13 }}>{name}</strong>
+        {latest && <strong title={options.chartTitle} aria-label={'Último valor ' + latest} style={{
+          whiteSpace: 'nowrap', fontSize: 14, color: lastColor,
+        }}>{latest}</strong>}
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 4, height: rowHeight, flexShrink: 0 }}>
         <Indicator label={options.labelA} status={options.routerInstalled === false ? 'Não instalado' : statusA} />
         <Indicator label={options.labelB} status={statusB} />
       </div>
-      <div style={{
-        minHeight: 0, flex: 1, display: 'flex', flexDirection: 'column',
-        borderTop: '1px solid ' + theme.colors.border.weak,
-      }}>
-        <div style={{ display: 'flex', gap: 5, justifyContent: 'space-between', lineHeight: '18px', fontSize: 11 }}>
-          <span title={options.chartTitle} style={ellipsis}>{options.chartTitle}</span>
-          {latest && <strong aria-label={'Último valor ' + latest} style={{ whiteSpace: 'nowrap', color: lastColor }}>{latest}</strong>}
-        </div>
+      <div style={{ minHeight: 0, flex: 1, display: 'flex', flexDirection: 'column' }}>
         {latest ? (
           <div aria-label={options.chartTitle} tabIndex={0}>
-            <TimeSeries frames={frames} width={Math.max(60, width - 16)} height={Math.max(24, height - 104)}
+            <TimeSeries frames={frames} width={Math.max(1, width - 2 * (paddingX + 1))}
+              height={Math.max(1, height - 2 * (rowHeight + gap + paddingY + 1))}
               timeRange={timeRange} timeZone={timeZone} legend={legend}>
               {(config, alignedFrame) => (
                 <TooltipPlugin config={config} data={alignedFrame} frames={frames} timeZone={timeZone} />
