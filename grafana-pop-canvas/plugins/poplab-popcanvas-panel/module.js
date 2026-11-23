@@ -60,10 +60,10 @@ var ellipsis = { overflow: "hidden", whiteSpace: "nowrap", textOverflow: "ellips
 var colors = { UP: "#147c27", DOWN: "#c62235", "N/D": "#515968" };
 var valid = (value) => typeof value === "number" && Number.isFinite(value);
 var voltageScales = /* @__PURE__ */ new Map([
-  ["12", { min: 8, max: 12 }],
-  ["24", { min: 15, max: 24 }],
+  ["12", { min: 10, max: 13 }],
+  ["24", { min: 16, max: 27 }],
   ["42", { min: 26, max: 42 }],
-  ["48", { min: 30, max: 48 }]
+  ["48", { min: 45, max: 55 }]
 ]);
 function failed(data, refId) {
   const errors = [...data.errors ?? [], ...data.error ? [data.error] : []];

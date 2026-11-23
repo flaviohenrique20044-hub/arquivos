@@ -12,10 +12,10 @@ const ellipsis = { overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'elli
 const colors = { UP: '#147c27', DOWN: '#c62235', 'N/D': '#515968' };
 const valid = (value) => typeof value === 'number' && Number.isFinite(value);
 const voltageScales = new Map([
-  ['12', { min: 8, max: 12 }],
-  ['24', { min: 15, max: 24 }],
+  ['12', { min: 10, max: 13 }],
+  ['24', { min: 16, max: 27 }],
   ['42', { min: 26, max: 42 }],
-  ['48', { min: 30, max: 48 }],
+  ['48', { min: 45, max: 55 }],
 ]);
 
 function failed(data, refId) {
