@@ -59,7 +59,12 @@ var container = {
 var ellipsis = { overflow: "hidden", whiteSpace: "nowrap", textOverflow: "ellipsis" };
 var colors = { UP: "#147c27", DOWN: "#c62235", "N/D": "#515968" };
 var valid = (value) => typeof value === "number" && Number.isFinite(value);
-var voltageScales = /* @__PURE__ */ new Map([["12", 15], ["42", 55], ["48", 60]]);
+var voltageScales = /* @__PURE__ */ new Map([
+  ["12", { min: 8, max: 12 }],
+  ["24", { min: 15, max: 24 }],
+  ["42", { min: 26, max: 42 }],
+  ["48", { min: 30, max: 48 }]
+]);
 function failed(data, refId) {
   const errors = [...data.errors ?? [], ...data.error ? [data.error] : []];
   return errors.some((error) => !error.refId || error.refId === refId) || data.state === "Error" && errors.length === 0;
@@ -150,7 +155,7 @@ function history(data, timeRange, options, theme, timeZone) {
     }
   }
   const hasLimit = valid(options.batteryLimit);
-  const scaleMax = voltageScales.get(options.bankVoltage);
+  const scale = voltageScales.get(options.bankVoltage);
   const normalColor = options.batteryNormalColor || "#68d851";
   const lowColor = options.batteryLowColor || "#e02f44";
   const frame = {
@@ -168,7 +173,7 @@ function history(data, timeRange, options, theme, timeZone) {
           { value: options.batteryLimit, color: normalColor }
         ] } },
         custom: {
-          ...scaleMax !== void 0 && { axisSoftMin: 0, axisSoftMax: scaleMax },
+          ...scale && { axisSoftMin: scale.min, axisSoftMax: scale.max },
           ...hasLimit && { gradientMode: "scheme" },
           lineWidth: 1.5,
           fillOpacity: 14,
@@ -250,7 +255,7 @@ var plugin = new import_data.PanelPlugin(Panel).setPanelOptions((builder) => bui
   description: "Define a escala visual do gr\xE1fico. Leituras fora da faixa ampliam o eixo.",
   settings: { options: [
     { value: "auto", label: "Autom\xE1tica" },
-    ...Array.from(voltageScales, ([value, max]) => ({ value, label: value + " V (escala de 0 a " + max + " V)" }))
+    ...Array.from(voltageScales, ([value, { min, max }]) => ({ value, label: value + " V (escala de " + min + " a " + max + " V)" }))
   ] }
 }).addNumberInput({ path: "batteryLimit", name: "Banco de baterias abaixo de", description: "Na unidade do gr\xE1fico. Deixe em branco para desativar o limite.", settings: { step: 0.1 } }).addColorPicker({ path: "batteryLowColor", name: "Cor abaixo do limite", defaultValue: "#e02f44" }).addColorPicker({ path: "batteryNormalColor", name: "Cor padr\xE3o do banco", defaultValue: "#68d851" }).addNumberInput({ path: "decimals", name: "Casas decimais", defaultValue: 1, settings: { min: 0, max: 8 } }).addNumberInput({
   path: "gapSeconds",
