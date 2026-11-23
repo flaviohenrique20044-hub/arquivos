@@ -11,6 +11,7 @@ const container = {
 const ellipsis = { overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' };
 const colors = { UP: '#147c27', DOWN: '#c62235', 'N/D': '#515968' };
 const valid = (value) => typeof value === 'number' && Number.isFinite(value);
+const voltageScales = new Map([['12', 15], ['42', 55], ['48', 60]]);
 
 function failed(data, refId) {
   const errors = [...(data.errors ?? []), ...(data.error ? [data.error] : [])];
@@ -108,6 +109,7 @@ function history(data, timeRange, options, theme, timeZone) {
   }
 
   const hasLimit = valid(options.batteryLimit);
+  const scaleMax = voltageScales.get(options.bankVoltage);
   const normalColor = options.batteryNormalColor || '#68d851';
   const lowColor = options.batteryLowColor || '#e02f44';
   const frame = {
@@ -123,6 +125,7 @@ function history(data, timeRange, options, theme, timeZone) {
           { value: options.batteryLimit, color: normalColor },
         ] } }),
         custom: {
+          ...(scaleMax !== undefined && { axisSoftMin: 0, axisSoftMax: scaleMax }),
           ...(hasLimit && { gradientMode: 'scheme' }),
           lineWidth: 1.5, fillOpacity: 14, drawStyle: 'line',
           showPoints: 'auto', spanNulls: false, axisBorderShow: false,
@@ -219,6 +222,14 @@ export const plugin = new PanelPlugin(Panel).setPanelOptions((builder) => builde
     settings: { min: 1, max: 86400 } })
   .addTextInput({ path: 'chartTitle', name: 'Título do gráfico C', defaultValue: 'Tensão do banco' })
   .addTextInput({ path: 'unit', name: 'Unidade do gráfico C', defaultValue: 'V' })
+  .addSelect({
+    path: 'bankVoltage', name: 'Tensão nominal do banco', defaultValue: 'auto',
+    description: 'Define a escala visual do gráfico. Leituras fora da faixa ampliam o eixo.',
+    settings: { options: [
+      { value: 'auto', label: 'Automática' },
+      ...Array.from(voltageScales, ([value, max]) => ({ value, label: value + ' V (escala de 0 a ' + max + ' V)' })),
+    ] },
+  })
   .addNumberInput({ path: 'batteryLimit', name: 'Banco de baterias abaixo de', description: 'Na unidade do gráfico. Deixe em branco para desativar o limite.', settings: { step: 0.1 } })
   .addColorPicker({ path: 'batteryLowColor', name: 'Cor abaixo do limite', defaultValue: '#e02f44' })
   .addColorPicker({ path: 'batteryNormalColor', name: 'Cor padrão do banco', defaultValue: '#68d851' })
