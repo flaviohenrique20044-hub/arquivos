@@ -86,27 +86,35 @@ function series(data, refId) {
     return time && value ? [{ frame, time, value }] : [];
   });
 }
-function useIndicator(data, refId, up, down, popName, timeRange) {
-  const previous = (0, import_react.useRef)();
-  const target = data.request?.targets?.find((query) => query.refId === refId);
-  const scope = JSON.stringify([popName, target, data.request?.scopedVars, timeRange.raw, up, down]);
-  let latest = previous.current?.scope === scope ? previous.current.sample : void 0;
+const retainedSamples = new Map();
+
+function useRetainedSample(panelKey, channel, sample) {
+  const key = JSON.stringify([panelKey, channel]);
+  const previous = retainedSamples.get(key);
+  const latest = sample && (!previous || sample.timestamp >= previous.timestamp) ? sample : previous;
+  (0, import_react.useEffect)(() => {
+    if (latest) {
+      retainedSamples.set(key, latest);
+    }
+  }, [key, latest]);
+  return latest;
+}
+
+function useIndicator(data, refId, up, down, panelKey) {
+  let sample;
   for (const { time, value } of series(data, refId)) {
     time.values.forEach((timestamp, index) => {
       const reading = value.values[index];
-      if (valid(timestamp) && valid(reading) && (reading === up || reading === down) && (!latest || timestamp >= latest.timestamp)) {
-        latest = { timestamp, value: reading };
+      if (valid(timestamp) && valid(reading) && (reading === up || reading === down) &&
+          (!sample || timestamp >= sample.timestamp)) {
+        sample = { timestamp, value: reading };
       }
     });
   }
-  (0, import_react.useEffect)(() => {
-    previous.current = { scope, sample: latest };
-  }, [scope, latest]);
-  if (!latest || up === down) {
-    return "N/D";
-  }
-  return latest.value === up ? "UP" : "DOWN";
+  const latest = useRetainedSample(panelKey, [refId, up, down], sample);
+  return !latest || up === down ? 'N/D' : latest.value === up ? 'UP' : 'DOWN';
 }
+
 function Indicator({ label, status }) {
   return /* @__PURE__ */ import_react.default.createElement("div", { title: label + " \xB7 " + status, "aria-label": label + " " + status, style: {
     ...ellipsis,
@@ -123,7 +131,7 @@ function Indicator({ label, status }) {
 function history(data, timeRange, options, theme, timeZone) {
   const entry = series(data, "C")[0];
   if (!entry) {
-    return {};
+    return undefined;
   }
   const from = timeRange.from.valueOf();
   const to = timeRange.to.valueOf();
@@ -137,6 +145,7 @@ function history(data, timeRange, options, theme, timeZone) {
   const times = [];
   const values = [];
   let last;
+  let lastTime;
   for (const [timestamp, value] of points) {
     const prev = times.at(-1);
     if (timestamp === prev) {
@@ -149,6 +158,7 @@ function history(data, timeRange, options, theme, timeZone) {
   for (let index = values.length - 1; index >= 0; index--) {
     if (valid(values[index])) {
       last = values[index];
+      lastTime = times[index];
       break;
     }
   }
@@ -185,7 +195,7 @@ function history(data, timeRange, options, theme, timeZone) {
     field.display = (0, import_data.getDisplayProcessor)({ field, theme, timeZone });
   }
   const lastColor = hasLimit && valid(last) ? theme.visualization.getColorByName(chartColor) : void 0;
-  return { frame, last, lastColor };
+  return valid(last) ? { frame, last, lastColor, timestamp: lastTime, timeRange } : undefined;
 }
 function latestTemperature(data, timeRange) {
   let latestTime = -Infinity;
@@ -201,23 +211,28 @@ function latestTemperature(data, timeRange) {
       }
     });
   }
-  return temperature;
+  return valid(temperature) ? { timestamp: latestTime, value: temperature } : undefined;
 }
-function Panel({ options, title, data, width, height, timeRange, timeZone }) {
+function Panel({ id, options, title, data, width, height, timeRange, timeZone }) {
   const theme = (0, import_ui.useTheme2)();
-  const statusA = useIndicator(data, "A", options.upA, options.downA, options.popName, timeRange);
-  const statusB = useIndicator(data, "B", options.upB, options.downB, options.popName, timeRange);
-  const { frame, last, lastColor } = (0, import_react.useMemo)(
+  const variables = Array.from(new URLSearchParams(window.location.search)).filter(([name]) => name.startsWith("var-"));
+  const panelKey = JSON.stringify([window.location.pathname, variables, id, options.popName || title, timeRange.raw?.from, timeRange.raw?.to]);
+  const statusA = useIndicator(data, "A", options.upA, options.downA, panelKey);
+  const statusB = useIndicator(data, "B", options.upB, options.downB, panelKey);
+  const currentHistory = (0, import_react.useMemo)(
     () => history(data, timeRange, options, theme, timeZone),
     [data, timeRange, options, theme, timeZone]
   );
+  const retainedHistory = useRetainedSample(panelKey, "C", currentHistory);
+  const { frame, last, lastColor } = retainedHistory || {};
   const frames = (0, import_react.useMemo)(() => frame ? [frame] : [], [frame]);
   const latest = valid(last) ? new Intl.NumberFormat("pt-BR", {
     maximumFractionDigits: options.decimals,
     minimumFractionDigits: options.decimals
   }).format(last) + (options.unit ? " " + options.unit : "") : null;
   const name = options.popName || title || "POP Canvas";
-  const temperature = (0, import_react.useMemo)(() => latestTemperature(data, timeRange), [data, timeRange]);
+  const currentTemperature = (0, import_react.useMemo)(() => latestTemperature(data, timeRange), [data, timeRange]);
+  const temperature = useRetainedSample(panelKey, "D", currentTemperature)?.value;
   const temperatureText = valid(temperature) ? temperature.toLocaleString("pt-BR", { maximumFractionDigits: 1 }) + " \xB0C" : "";
   return /* @__PURE__ */ import_react.default.createElement("article", { "aria-label": name, style: {
     ...container,
@@ -234,7 +249,7 @@ function Panel({ options, title, data, width, height, timeRange, timeZone }) {
       frames,
       width: Math.max(1, width - 2 * (paddingX + 1)),
       height: Math.max(1, height - 2 * (rowHeight + gap + paddingY + 1)),
-      timeRange,
+      timeRange: retainedHistory.timeRange,
       timeZone,
       legend
     },
