@@ -231,6 +231,7 @@ function Panel({ id, options, title, data, width, height, timeRange, timeZone })
   const theme = (0, import_ui.useTheme2)();
   const variables = Array.from(new URLSearchParams(window.location.search)).filter(([name]) => name.startsWith("var-"));
   const panelKey = JSON.stringify([window.location.pathname, variables, id, options.popName || title, timeRange.raw?.from, timeRange.raw?.to]);
+  const showRouter = options.popHasRouter !== false;
   const statusA = useIndicator(data, "A", options.upA, options.downA, panelKey);
   const statusB = useIndicator(data, "B", options.upB, options.downB, panelKey);
   const currentHistory = (0, import_react.useMemo)(
@@ -257,7 +258,7 @@ function Panel({ id, options, title, data, width, height, timeRange, timeZone })
     ...ellipsis,
     textAlign: "right",
     fontSize: 13
-  } }, temperatureText)), /* @__PURE__ */ import_react.default.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 0, borderRadius: 3, overflow: "hidden", height: rowHeight, flexShrink: 0 } }, /* @__PURE__ */ import_react.default.createElement(Indicator, { label: options.labelA, status: options.routerInstalled === false ? "N\xE3o instalado" : statusA }), /* @__PURE__ */ import_react.default.createElement(Indicator, { label: options.labelB, status: statusB })), /* @__PURE__ */ import_react.default.createElement("div", { style: { minHeight: 0, flex: 1, display: "flex", flexDirection: "column" } }, latest ? /* @__PURE__ */ import_react.default.createElement("div", { "aria-label": options.chartTitle, tabIndex: 0, style: { position: "relative", flex: 1, minHeight: 0 } }, /* @__PURE__ */ import_react.default.createElement(
+  } }, temperatureText)), /* @__PURE__ */ import_react.default.createElement("div", { style: { display: "grid", gridTemplateColumns: showRouter ? "repeat(2, minmax(0, 1fr))" : "minmax(0, 1fr)", gap: 0, borderRadius: 3, overflow: "hidden", height: rowHeight, flexShrink: 0 } }, showRouter && /* @__PURE__ */ import_react.default.createElement(Indicator, { label: options.labelA, status: options.routerInstalled === false ? "N\xE3o instalado" : statusA }), /* @__PURE__ */ import_react.default.createElement(Indicator, { label: options.labelB, status: statusB })), /* @__PURE__ */ import_react.default.createElement("div", { style: { minHeight: 0, flex: 1, display: "flex", flexDirection: "column" } }, latest ? /* @__PURE__ */ import_react.default.createElement("div", { "aria-label": options.chartTitle, tabIndex: 0, style: { position: "relative", flex: 1, minHeight: 0 } }, /* @__PURE__ */ import_react.default.createElement(
     import_ui.TimeSeries,
     {
       frames,
@@ -281,7 +282,7 @@ function Panel({ id, options, title, data, width, height, timeRange, timeZone })
     textShadow: "0 0 3px " + theme.colors.background.secondary
   } }, latest)) : /* @__PURE__ */ import_react.default.createElement("div", { style: { flex: 1, display: "grid", placeItems: "center", fontSize: 11, color: theme.colors.text.secondary } }, "Sem hist\xF3rico")));
 }
-var plugin = new import_data.PanelPlugin(Panel).setPanelOptions((builder) => builder.addTextInput({ path: "popName", name: "Nome do POP", defaultValue: "" }).addTextInput({ path: "labelA", name: "Nome do indicador A", defaultValue: "Roteador" }).addBooleanSwitch({ path: "routerInstalled", name: "Roteador do POP adicionado?", defaultValue: true }).addNumberInput({ path: "upA", name: "Valor UP para A", defaultValue: 1 }).addNumberInput({ path: "downA", name: "Valor DOWN para A", defaultValue: 0 }).addTextInput({ path: "labelB", name: "Nome do indicador B", defaultValue: "Energia" }).addNumberInput({ path: "upB", name: "Valor UP para B", defaultValue: 1 }).addNumberInput({ path: "downB", name: "Valor DOWN para B", defaultValue: 0 }).addTextInput({ path: "chartTitle", name: "T\xEDtulo do gr\xE1fico C", defaultValue: "Tens\xE3o do banco" }).addTextInput({ path: "unit", name: "Unidade do gr\xE1fico C", defaultValue: "V" }).addSelect({
+var plugin = new import_data.PanelPlugin(Panel).setPanelOptions((builder) => builder.addTextInput({ path: "popName", name: "Nome do POP", defaultValue: "" }).addTextInput({ path: "labelA", name: "Nome do indicador A", defaultValue: "Roteador" }).addBooleanSwitch({ path: "popHasRouter", name: "POP vai possuir roteador?", defaultValue: true }).addBooleanSwitch({ path: "routerInstalled", name: "Roteador do POP adicionado?", defaultValue: true }).addNumberInput({ path: "upA", name: "Valor UP para A", defaultValue: 1 }).addNumberInput({ path: "downA", name: "Valor DOWN para A", defaultValue: 0 }).addTextInput({ path: "labelB", name: "Nome do indicador B", defaultValue: "Energia" }).addNumberInput({ path: "upB", name: "Valor UP para B", defaultValue: 1 }).addNumberInput({ path: "downB", name: "Valor DOWN para B", defaultValue: 0 }).addTextInput({ path: "chartTitle", name: "T\xEDtulo do gr\xE1fico C", defaultValue: "Tens\xE3o do banco" }).addTextInput({ path: "unit", name: "Unidade do gr\xE1fico C", defaultValue: "V" }).addSelect({
   path: "bankVoltage",
   name: "Tens\xE3o nominal do banco",
   defaultValue: "auto",
