@@ -73,7 +73,7 @@ function failed(data, refId) {
   const errors = [...data.errors ?? [], ...data.error ? [data.error] : []];
   return errors.some((error) => !error.refId || error.refId === refId) || data.state === "Error" && errors.length === 0;
 }
-function series(data, refId) {
+function series(data, refId, allowText = false) {
   if (failed(data, refId)) {
     return [];
   }
@@ -82,36 +82,43 @@ function series(data, refId) {
       return [];
     }
     const time = frame.fields.find((field) => field.type === "time");
-    const value = frame.fields.find((field) => field.type === "number");
+    const value = frame.fields.find((field) => field.type === "number") ??
+      (allowText && frame.fields.find((field) => field.type === 'string'));
     return time && value ? [{ frame, time, value }] : [];
   });
 }
 const retainedSamples = new Map();
 
-function useRetainedSample(panelKey, channel, sample) {
+function useRetainedSample(panelKey, channel, sample, source) {
   const key = JSON.stringify([panelKey, channel]);
   const previous = retainedSamples.get(key);
-  const latest = sample && (!previous || sample.timestamp >= previous.timestamp) ? sample : previous;
+  const sameSource = source === undefined || source === previous?.source;
+  const priorSample = sameSource ? previous?.sample : undefined;
+  const latest = sample && (!priorSample || sample.timestamp >= priorSample.timestamp) ? sample : priorSample;
+  const activeSource = source ?? previous?.source;
   (0, import_react.useEffect)(() => {
-    if (latest) {
-      retainedSamples.set(key, latest);
+    if (latest || activeSource !== undefined) {
+      retainedSamples.set(key, { source: activeSource, sample: latest });
     }
-  }, [key, latest]);
+  }, [key, latest, activeSource]);
   return latest;
 }
 
 function useIndicator(data, refId, up, down, panelKey) {
+  const target = data.request?.targets?.find((query) => query.refId === refId);
+  const source = target ? JSON.stringify(target) : undefined;
   let sample;
-  for (const { time, value } of series(data, refId)) {
+  for (const { time, value } of series(data, refId, true)) {
     time.values.forEach((timestamp, index) => {
-      const reading = value.values[index];
+      const raw = value.values[index];
+      const reading = typeof raw === "string" && raw.trim() !== "" ? Number(raw) : raw;
       if (valid(timestamp) && valid(reading) && (reading === up || reading === down) &&
           (!sample || timestamp >= sample.timestamp)) {
         sample = { timestamp, value: reading };
       }
     });
   }
-  const latest = useRetainedSample(panelKey, [refId, up, down], sample);
+  const latest = useRetainedSample(panelKey, [refId, up, down], data.state === "Loading" ? undefined : sample, source);
   return !latest || up === down ? 'N/D' : latest.value === up ? 'UP' : 'DOWN';
 }
 
