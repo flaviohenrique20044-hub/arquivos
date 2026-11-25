@@ -82,8 +82,6 @@ function history(data, timeRange, options, theme, timeZone) {
   }
   const from = timeRange.from.valueOf();
   const to = timeRange.to.valueOf();
-  const step = entry.time.config.interval ?? data.request?.intervalMs ?? 0;
-  const gap = Math.max(options.gapSeconds * 1000, step * 1.5);
   const points = entry.time.values.flatMap((timestamp, index) => {
     if (!valid(timestamp) || timestamp < from || timestamp > to) {
       return [];
@@ -100,10 +98,6 @@ function history(data, timeRange, options, theme, timeZone) {
     if (timestamp === prev) {
       values[values.length - 1] = value;
     } else {
-      if (prev !== undefined && timestamp - prev > gap) {
-        times.push(prev + (timestamp - prev) / 2);
-        values.push(null);
-      }
       times.push(timestamp);
       values.push(value);
     }
@@ -132,7 +126,7 @@ function history(data, timeRange, options, theme, timeZone) {
           ...(scale && { axisSoftMin: scale.min, axisSoftMax: scale.max }),
           axisPlacement: 'hidden', axisGridShow: false,
           lineWidth: 2, fillOpacity: 14, drawStyle: 'line',
-          showPoints: 'auto', spanNulls: false, axisBorderShow: false,
+          showPoints: 'auto', spanNulls: true, axisBorderShow: false,
         },
       } },
     ],
@@ -245,5 +239,4 @@ export const plugin = new PanelPlugin(Panel).setPanelOptions((builder) => builde
   .addColorPicker({ path: 'batteryLowColor', name: 'Cor abaixo do limite', defaultValue: '#e02f44' })
   .addColorPicker({ path: 'batteryNormalColor', name: 'Cor padrão do banco', defaultValue: '#68d851' })
   .addNumberInput({ path: 'decimals', name: 'Casas decimais', defaultValue: 1, settings: { min: 0, max: 8 } })
-  .addNumberInput({ path: 'gapSeconds', name: 'Lacuna no gráfico após segundos sem amostra', defaultValue: 22.5,
-    settings: { min: 1, max: 86400 } }));
+  );
