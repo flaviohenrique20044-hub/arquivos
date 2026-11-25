@@ -200,17 +200,19 @@ function Panel({ id, options, title, data, width, height, timeRange, timeZone })
   const name = options.popName || title || 'POP Canvas';
   const currentTemperature = useMemo(() => latestTemperature(data, timeRange), [data, timeRange]);
   const temperature = useRetainedSample(panelKey, "D", currentTemperature)?.value;
+  const temperatureSymbol = options.externalTemperature ? "≋" : "▣";
+  const temperatureSource = options.externalTemperature ? "Temperatura ambiente do POP" : "Temperatura interna do equipamento";
   const temperatureText = valid(temperature)
-    ? temperature.toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + ' °C'
+    ? temperatureSymbol + " " + temperature.toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + ' °C'
     : '';
   return (
     <article aria-label={name} style={{
       ...container, color: theme.colors.text.primary, background: theme.colors.background.secondary,
       borderColor: theme.colors.border.medium,
     }}>
-      <div style={{ display: 'grid', alignItems: 'center', gridTemplateColumns: temperatureText ? 'min(23%, 58px) minmax(0, 1fr) min(23%, 58px)' : '1fr', height: rowHeight, flexShrink: 0 }}>
+      <div style={{ display: 'grid', alignItems: 'center', gridTemplateColumns: temperatureText ? 'min(32%, 76px) minmax(0, 1fr) min(32%, 76px)' : '1fr', height: rowHeight, flexShrink: 0 }}>
         <strong title={name} style={{ ...ellipsis, gridColumn: temperatureText ? 2 : 1, textAlign: 'center', fontSize: 15 }}>{name}</strong>
-        {temperatureText && <strong title={'Temperatura: ' + temperatureText} style={{
+        {temperatureText && <strong title={temperatureSource + " · " + temperatureText} style={{
           ...ellipsis, textAlign: 'right', fontSize: 13,
         }}>{temperatureText}</strong>}
       </div>
@@ -268,4 +270,4 @@ export const plugin = new PanelPlugin(Panel).setPanelOptions((builder) => builde
   .addColorPicker({ path: 'batteryLowColor', name: 'Cor abaixo do limite', defaultValue: '#e02f44' })
   .addColorPicker({ path: 'batteryNormalColor', name: 'Cor padrão do banco', defaultValue: '#68d851' })
   .addNumberInput({ path: 'decimals', name: 'Casas decimais', defaultValue: 1, settings: { min: 0, max: 8 } })
-  );
+  .addBooleanSwitch({ path: "externalTemperature", name: "POP possui monitoramento de temperatura externa?", description: "Marque se um sensor independente mede a temperatura do ambiente do POP (≋). Desmarque se a leitura vem do sensor interno de um equipamento (▣).", defaultValue: false }));
