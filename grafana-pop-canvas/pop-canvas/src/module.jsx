@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { getDisplayProcessor, PanelPlugin } from '@grafana/data';
 import { TimeSeries, TooltipPlugin, useTheme2 } from '@grafana/ui';
 
@@ -42,27 +42,33 @@ function series(data, refId) {
   });
 }
 
-function useIndicator(data, refId, up, down, popName, timeRange) {
-  const previous = useRef();
-  const target = data.request?.targets?.find((query) => query.refId === refId);
-  const scope = JSON.stringify([popName, target, data.request?.scopedVars, timeRange.raw, up, down]);
-  let latest = previous.current?.scope === scope ? previous.current.sample : undefined;
+const retainedSamples = new Map();
+
+function useRetainedSample(panelKey, channel, sample) {
+  const key = JSON.stringify([panelKey, channel]);
+  const previous = retainedSamples.get(key);
+  const latest = sample && (!previous || sample.timestamp >= previous.timestamp) ? sample : previous;
+  useEffect(() => {
+    if (latest) {
+      retainedSamples.set(key, latest);
+    }
+  }, [key, latest]);
+  return latest;
+}
+
+function useIndicator(data, refId, up, down, panelKey) {
+  let sample;
   for (const { time, value } of series(data, refId)) {
     time.values.forEach((timestamp, index) => {
       const reading = value.values[index];
       if (valid(timestamp) && valid(reading) && (reading === up || reading === down) &&
-          (!latest || timestamp >= latest.timestamp)) {
-        latest = { timestamp, value: reading };
+          (!sample || timestamp >= sample.timestamp)) {
+        sample = { timestamp, value: reading };
       }
     });
   }
-  useEffect(() => {
-    previous.current = { scope, sample: latest };
-  }, [scope, latest]);
-  if (!latest || up === down) {
-    return 'N/D';
-  }
-  return latest.value === up ? 'UP' : 'DOWN';
+  const latest = useRetainedSample(panelKey, [refId, up, down], sample);
+  return !latest || up === down ? 'N/D' : latest.value === up ? 'UP' : 'DOWN';
 }
 
 function Indicator({ label, status }) {
@@ -78,7 +84,7 @@ function Indicator({ label, status }) {
 function history(data, timeRange, options, theme, timeZone) {
   const entry = series(data, 'C')[0];
   if (!entry) {
-    return {};
+    return undefined;
   }
   const from = timeRange.from.valueOf();
   const to = timeRange.to.valueOf();
@@ -93,6 +99,7 @@ function history(data, timeRange, options, theme, timeZone) {
   const times = [];
   const values = [];
   let last;
+  let lastTime;
   for (const [timestamp, value] of points) {
     const prev = times.at(-1);
     if (timestamp === prev) {
@@ -105,6 +112,7 @@ function history(data, timeRange, options, theme, timeZone) {
   for (let index = values.length - 1; index >= 0; index--) {
     if (valid(values[index])) {
       last = values[index];
+      lastTime = times[index];
       break;
     }
   }
@@ -137,7 +145,7 @@ function history(data, timeRange, options, theme, timeZone) {
   const lastColor = hasLimit && valid(last)
     ? theme.visualization.getColorByName(chartColor)
     : undefined;
-  return { frame, last, lastColor };
+  return valid(last) ? { frame, last, lastColor, timestamp: lastTime, timeRange } : undefined;
 }
 
 function latestTemperature(data, timeRange) {
@@ -154,24 +162,29 @@ function latestTemperature(data, timeRange) {
       }
     });
   }
-  return temperature;
+  return valid(temperature) ? { timestamp: latestTime, value: temperature } : undefined;
 }
 
-function Panel({ options, title, data, width, height, timeRange, timeZone }) {
+function Panel({ id, options, title, data, width, height, timeRange, timeZone }) {
   const theme = useTheme2();
-  const statusA = useIndicator(data, 'A', options.upA, options.downA, options.popName, timeRange);
-  const statusB = useIndicator(data, 'B', options.upB, options.downB, options.popName, timeRange);
+  const variables = Array.from(new URLSearchParams(window.location.search)).filter(([name]) => name.startsWith("var-"));
+  const panelKey = JSON.stringify([window.location.pathname, variables, id, options.popName || title, timeRange.raw?.from, timeRange.raw?.to]);
+  const statusA = useIndicator(data, 'A', options.upA, options.downA, panelKey);
+  const statusB = useIndicator(data, 'B', options.upB, options.downB, panelKey);
 
-  const { frame, last, lastColor } = useMemo(
+  const currentHistory = useMemo(
     () => history(data, timeRange, options, theme, timeZone),
     [data, timeRange, options, theme, timeZone]
   );
+  const retainedHistory = useRetainedSample(panelKey, "C", currentHistory);
+  const { frame, last, lastColor } = retainedHistory || {};
   const frames = useMemo(() => frame ? [frame] : [], [frame]);
   const latest = valid(last) ? new Intl.NumberFormat('pt-BR', {
     maximumFractionDigits: options.decimals, minimumFractionDigits: options.decimals,
   }).format(last) + (options.unit ? ' ' + options.unit : '') : null;
   const name = options.popName || title || 'POP Canvas';
-  const temperature = useMemo(() => latestTemperature(data, timeRange), [data, timeRange]);
+  const currentTemperature = useMemo(() => latestTemperature(data, timeRange), [data, timeRange]);
+  const temperature = useRetainedSample(panelKey, "D", currentTemperature)?.value;
   const temperatureText = valid(temperature)
     ? temperature.toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + ' °C'
     : '';
@@ -195,7 +208,7 @@ function Panel({ options, title, data, width, height, timeRange, timeZone }) {
           <div aria-label={options.chartTitle} tabIndex={0} style={{ position: 'relative', flex: 1, minHeight: 0 }}>
             <TimeSeries frames={frames} width={Math.max(1, width - 2 * (paddingX + 1))}
               height={Math.max(1, height - 2 * (rowHeight + gap + paddingY + 1))}
-              timeRange={timeRange} timeZone={timeZone} legend={legend}>
+              timeRange={retainedHistory.timeRange} timeZone={timeZone} legend={legend}>
               {(config, alignedFrame) => (
                 <TooltipPlugin config={config} data={alignedFrame} frames={frames} timeZone={timeZone} />
               )}
