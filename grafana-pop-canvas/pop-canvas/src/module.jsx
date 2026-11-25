@@ -183,6 +183,7 @@ function Panel({ id, options, title, data, width, height, timeRange, timeZone })
   const theme = useTheme2();
   const variables = Array.from(new URLSearchParams(window.location.search)).filter(([name]) => name.startsWith("var-"));
   const panelKey = JSON.stringify([window.location.pathname, variables, id, options.popName || title, timeRange.raw?.from, timeRange.raw?.to]);
+  const showRouter = options.popHasRouter !== false;
   const statusA = useIndicator(data, 'A', options.upA, options.downA, panelKey);
   const statusB = useIndicator(data, 'B', options.upB, options.downB, panelKey);
 
@@ -213,8 +214,8 @@ function Panel({ id, options, title, data, width, height, timeRange, timeZone })
           ...ellipsis, textAlign: 'right', fontSize: 13,
         }}>{temperatureText}</strong>}
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 0, borderRadius: 3, overflow: 'hidden', height: rowHeight, flexShrink: 0 }}>
-        <Indicator label={options.labelA} status={options.routerInstalled === false ? 'Não instalado' : statusA} />
+      <div style={{ display: 'grid', gridTemplateColumns: showRouter ? "repeat(2, minmax(0, 1fr))" : "minmax(0, 1fr)", gap: 0, borderRadius: 3, overflow: 'hidden', height: rowHeight, flexShrink: 0 }}>
+        {showRouter && <Indicator label={options.labelA} status={options.routerInstalled === false ? 'Não instalado' : statusA} />}
         <Indicator label={options.labelB} status={statusB} />
       </div>
       <div style={{ minHeight: 0, flex: 1, display: 'flex', flexDirection: 'column' }}>
@@ -246,6 +247,7 @@ function Panel({ id, options, title, data, width, height, timeRange, timeZone })
 export const plugin = new PanelPlugin(Panel).setPanelOptions((builder) => builder
   .addTextInput({ path: 'popName', name: 'Nome do POP', defaultValue: '' })
   .addTextInput({ path: 'labelA', name: 'Nome do indicador A', defaultValue: 'Roteador' })
+  .addBooleanSwitch({ path: "popHasRouter", name: "POP vai possuir roteador?", defaultValue: true })
   .addBooleanSwitch({ path: 'routerInstalled', name: 'Roteador do POP adicionado?', defaultValue: true })
   .addNumberInput({ path: 'upA', name: 'Valor UP para A', defaultValue: 1 })
   .addNumberInput({ path: 'downA', name: 'Valor DOWN para A', defaultValue: 0 })
