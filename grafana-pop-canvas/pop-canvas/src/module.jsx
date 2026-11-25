@@ -200,6 +200,7 @@ function Panel({ id, options, title, data, width, height, timeRange, timeZone })
   const name = options.popName || title || 'POP Canvas';
   const currentTemperature = useMemo(() => latestTemperature(data, timeRange), [data, timeRange]);
   const temperature = useRetainedSample(panelKey, "D", currentTemperature)?.value;
+  const temperatureHigh = valid(temperature) && valid(options.temperatureLimit) && temperature > options.temperatureLimit;
   const temperatureSymbol = options.externalTemperature ? "≋" : "▣";
   const temperatureSource = options.externalTemperature ? "Temperatura ambiente do POP" : "Temperatura interna do equipamento";
   const temperatureText = valid(temperature)
@@ -210,7 +211,7 @@ function Panel({ id, options, title, data, width, height, timeRange, timeZone })
       ...container, color: theme.colors.text.primary, background: theme.colors.background.secondary,
       borderColor: theme.colors.border.medium,
     }}>
-      <div style={{ display: 'grid', alignItems: 'center', gridTemplateColumns: temperatureText ? 'min(32%, 76px) minmax(0, 1fr) min(32%, 76px)' : '1fr', height: rowHeight, flexShrink: 0 }}>
+      <div style={{ display: 'grid', alignItems: 'center', color: temperatureHigh ? "#f2495c" : undefined, gridTemplateColumns: temperatureText ? 'min(32%, 76px) minmax(0, 1fr) min(32%, 76px)' : '1fr', height: rowHeight, flexShrink: 0 }}>
         <strong title={name} style={{ ...ellipsis, gridColumn: temperatureText ? 2 : 1, textAlign: 'center', fontSize: 15 }}>{name}</strong>
         {temperatureText && <strong title={temperatureSource + " · " + temperatureText} style={{
           ...ellipsis, textAlign: 'right', fontSize: 13,
@@ -270,4 +271,5 @@ export const plugin = new PanelPlugin(Panel).setPanelOptions((builder) => builde
   .addColorPicker({ path: 'batteryLowColor', name: 'Cor abaixo do limite', defaultValue: '#e02f44' })
   .addColorPicker({ path: 'batteryNormalColor', name: 'Cor padrão do banco', defaultValue: '#68d851' })
   .addNumberInput({ path: 'decimals', name: 'Casas decimais', defaultValue: 1, settings: { min: 0, max: 8 } })
-  .addBooleanSwitch({ path: "externalTemperature", name: "POP possui monitoramento de temperatura externa?", description: "Marque se um sensor independente mede a temperatura do ambiente do POP (≋). Desmarque se a leitura vem do sensor interno de um equipamento (▣).", defaultValue: false }));
+  .addBooleanSwitch({ path: "externalTemperature", name: "POP possui monitoramento de temperatura externa?", description: "Marque se um sensor independente mede a temperatura do ambiente do POP (≋). Desmarque se a leitura vem do sensor interno de um equipamento (▣).", defaultValue: false })
+  .addNumberInput({ path: "temperatureLimit", name: "Limite de temperatura (°C)", description: "Acima deste valor, o nome do POP, o símbolo e a temperatura ficam vermelhos. Deixe em branco para desativar.", settings: { step: 0.1 } }));
