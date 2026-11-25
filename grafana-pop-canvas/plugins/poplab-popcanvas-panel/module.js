@@ -127,8 +127,6 @@ function history(data, timeRange, options, theme, timeZone) {
   }
   const from = timeRange.from.valueOf();
   const to = timeRange.to.valueOf();
-  const step = entry.time.config.interval ?? data.request?.intervalMs ?? 0;
-  const gap2 = Math.max(options.gapSeconds * 1e3, step * 1.5);
   const points = entry.time.values.flatMap((timestamp, index) => {
     if (!valid(timestamp) || timestamp < from || timestamp > to) {
       return [];
@@ -144,10 +142,6 @@ function history(data, timeRange, options, theme, timeZone) {
     if (timestamp === prev) {
       values[values.length - 1] = value;
     } else {
-      if (prev !== void 0 && timestamp - prev > gap2) {
-        times.push(prev + (timestamp - prev) / 2);
-        values.push(null);
-      }
       times.push(timestamp);
       values.push(value);
     }
@@ -181,7 +175,7 @@ function history(data, timeRange, options, theme, timeZone) {
           fillOpacity: 14,
           drawStyle: "line",
           showPoints: "auto",
-          spanNulls: false,
+          spanNulls: true,
           axisBorderShow: false
         }
       } }
@@ -267,12 +261,7 @@ var plugin = new import_data.PanelPlugin(Panel).setPanelOptions((builder) => bui
     { value: "auto", label: "Autom\xE1tica" },
     ...Array.from(voltageScales, ([value, { min, max }]) => ({ value, label: value + " V (escala de " + min + " a " + max + " V)" }))
   ] }
-}).addNumberInput({ path: "batteryLimit", name: "Banco de baterias abaixo de", description: "Na unidade do gr\xE1fico. Deixe em branco para desativar o limite.", settings: { step: 0.1 } }).addColorPicker({ path: "batteryLowColor", name: "Cor abaixo do limite", defaultValue: "#e02f44" }).addColorPicker({ path: "batteryNormalColor", name: "Cor padr\xE3o do banco", defaultValue: "#68d851" }).addNumberInput({ path: "decimals", name: "Casas decimais", defaultValue: 1, settings: { min: 0, max: 8 } }).addNumberInput({
-  path: "gapSeconds",
-  name: "Lacuna no gr\xE1fico ap\xF3s segundos sem amostra",
-  defaultValue: 22.5,
-  settings: { min: 1, max: 86400 }
-}));
+}).addNumberInput({ path: "batteryLimit", name: "Banco de baterias abaixo de", description: "Na unidade do gr\xE1fico. Deixe em branco para desativar o limite.", settings: { step: 0.1 } }).addColorPicker({ path: "batteryLowColor", name: "Cor abaixo do limite", defaultValue: "#e02f44" }).addColorPicker({ path: "batteryNormalColor", name: "Cor padr\xE3o do banco", defaultValue: "#68d851" }).addNumberInput({ path: "decimals", name: "Casas decimais", defaultValue: 1, settings: { min: 0, max: 8 } }));
 
       publish('plugin', module.exports.plugin);
     }
