@@ -49,9 +49,9 @@ function useRetainedSample(panelKey, channel, sample, source) {
   const key = JSON.stringify([panelKey, channel]);
   const previous = retainedSamples.get(key);
   const sameSource = source === undefined || source === previous?.source;
-  const priorSample = sameSource ? previous?.sample : undefined;
-  const latest = sample && (!priorSample || sample.timestamp >= priorSample.timestamp) ? sample : priorSample;
-  const activeSource = source ?? previous?.source;
+  const priorSample = previous?.sample;
+  const latest = sample && (!priorSample || !sameSource || sample.timestamp >= priorSample.timestamp) ? sample : priorSample;
+  const activeSource = sample ? source ?? previous?.source : previous?.source;
   useEffect(() => {
     if (latest || activeSource !== undefined) {
       retainedSamples.set(key, { source: activeSource, sample: latest });
@@ -60,9 +60,16 @@ function useRetainedSample(panelKey, channel, sample, source) {
   return latest;
 }
 
+function sensorIdentity(target) {
+  if (!target) return undefined;
+  const { datasource, group, host, application, item, itemid, itemids, query } = target;
+  if (![item, itemid, itemids, query].some(value => value != null && value !== "")) return undefined;
+  return JSON.stringify([datasource?.uid ?? datasource, group, host, application, item, itemid, itemids, query]);
+}
+
 function useIndicator(data, refId, up, down, panelKey) {
   const target = data.request?.targets?.find((query) => query.refId === refId);
-  const source = target ? JSON.stringify(target) : undefined;
+  const source = sensorIdentity(target);
   let sample;
   for (const { time, value } of series(data, refId, true)) {
     time.values.forEach((timestamp, index) => {
